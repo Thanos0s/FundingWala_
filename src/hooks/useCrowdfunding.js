@@ -24,23 +24,71 @@ export const useCrowdfunding = () => {
     amountXLM: null,
   });
 
+  const [milestones, setMilestones] = useState([]);
+  const [spendingLogs, setSpendingLogs] = useState([]);
+  const [creatorReputation, setCreatorReputation] = useState({
+    completedMilestones: 1,
+    totalCampaigns: 1,
+    totalDeliveredXLM: 300,
+    trustScore: 94,
+  });
+  const [votingState, setVotingState] = useState({ status: 'idle', error: null });
+
   const refreshIntervalRef = useRef(null);
 
   /**
-   * Fetch campaign data from contract
+   * Fetch campaign & milestone data from contract
    */
   const fetchCampaign = useCallback(async () => {
     try {
-      const data = await contractService.getCampaign();
+      const [campData, milesData, logsData, repData] = await Promise.all([
+        contractService.getCampaign(),
+        contractService.getMilestones(),
+        contractService.getSpendingLogs(),
+        contractService.getCreatorReputation(),
+      ]);
+
       const progress =
-        data.goal > 0 ? Math.min(100, (data.raised / data.goal) * 100) : 0;
-      setCampaign({ ...data, progress });
+        campData.goal > 0 ? Math.min(100, (campData.raised / campData.goal) * 100) : 0;
+      setCampaign({ ...campData, progress });
+      setMilestones(milesData);
+      setSpendingLogs(logsData);
+      setCreatorReputation(repData);
     } catch (error) {
-      console.error('Failed to fetch campaign:', error);
+      console.error('Failed to fetch campaign data:', error);
     } finally {
       setLoadingCampaign(false);
     }
   }, []);
+
+  /**
+   * Vote on a milestone
+   */
+  const voteMilestone = useCallback(async (milestoneId, approve = true) => {
+    setVotingState({ status: 'voting', error: null });
+    try {
+      const res = await contractService.voteMilestone(milestoneId, approve);
+      setVotingState({ status: 'voted', error: null });
+      await fetchCampaign();
+      return res;
+    } catch (err) {
+      setVotingState({ status: 'error', error: err.message || 'Voting failed' });
+      throw err;
+    }
+  }, [fetchCampaign]);
+
+  /**
+   * Claim automated refund
+   */
+  const claimRefund = useCallback(async () => {
+    try {
+      const res = await contractService.claimRefund();
+      await fetchCampaign();
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  }, [fetchCampaign]);
 
   /**
    * Start auto-refresh polling
@@ -168,12 +216,22 @@ export const useCrowdfunding = () => {
     });
   }, []);
 
+  // Compute Quadratic Funding metrics dynamically
+  const qfMetrics = contractService.calculateQuadraticFunding(donations, 500);
+
   return {
     campaign,
     donations,
+    milestones,
+    spendingLogs,
+    creatorReputation,
+    qfMetrics,
     loadingCampaign,
     donationState,
+    votingState,
     donate,
+    voteMilestone,
+    claimRefund,
     resetDonation,
     refreshCampaign: fetchCampaign,
   };

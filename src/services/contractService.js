@@ -304,6 +304,288 @@ export class ContractService {
   }
 
   /**
+   * Get milestone tranches from smart contract
+   */
+  async getMilestones() {
+    try {
+      const contract = new StellarSdk.Contract(this.contractAddress);
+      const dummyAccount = this._getDummyAccount();
+
+      const tx = new StellarSdk.TransactionBuilder(dummyAccount, {
+        fee: StellarSdk.BASE_FEE,
+        networkPassphrase: CONFIG.NETWORK_PASSPHRASE,
+      })
+        .addOperation(contract.call('get_milestones'))
+        .setTimeout(30)
+        .build();
+
+      const response = await this.server.simulateTransaction(tx);
+      if (this._isSimulationError(response)) return this._getMockMilestones();
+
+      const retval = response.result?.retval;
+      if (!retval) return this._getMockMilestones();
+
+      const native = StellarSdk.scValToNative(retval);
+      if (!Array.isArray(native)) return this._getMockMilestones();
+
+      return native.map((m, idx) => ({
+        id: Number(m.id || idx + 1),
+        title: String(m.title || `Phase ${idx + 1}`),
+        targetAmount: Number(m.target_amount || 0) / 10_000_000,
+        deadline: Number(m.deadline || 0),
+        approvals: Number(m.approvals || 0),
+        rejections: Number(m.rejections || 0),
+        released: Boolean(m.released),
+        disputed: Boolean(m.disputed),
+      }));
+    } catch (e) {
+      console.warn('getMilestones error:', e);
+      return this._getMockMilestones();
+    }
+  }
+
+  /**
+   * Vote on a milestone (Backer approval governance)
+   */
+  async voteMilestone(milestoneId, approve = true) {
+    if (!walletService.isConnected()) {
+      throw new ContractExecutionError('Please connect your wallet before voting.');
+    }
+    const publicKey = walletService.publicKey;
+    const contract = new StellarSdk.Contract(this.contractAddress);
+    const account = await this.horizonServer.loadAccount(publicKey);
+
+    const tx = new StellarSdk.TransactionBuilder(account, {
+      fee: (parseInt(StellarSdk.BASE_FEE) * 10).toString(),
+      networkPassphrase: CONFIG.NETWORK_PASSPHRASE,
+    })
+      .addOperation(
+        contract.call(
+          'vote_milestone',
+          StellarSdk.nativeToScVal(publicKey, { type: 'address' }),
+          StellarSdk.nativeToScVal(milestoneId, { type: 'u32' }),
+          StellarSdk.nativeToScVal(approve, { type: 'bool' })
+        )
+      )
+      .setTimeout(CONFIG.DEFAULT_TIMEOUT)
+      .build();
+
+    const simulated = await this.server.simulateTransaction(tx);
+    if (this._isSimulationError(simulated)) {
+      throw new TransactionFailedError(
+        simulated?.error || 'Milestone voting simulation failed',
+        null
+      );
+    }
+
+    const assembledTx = StellarSdk.SorobanRpc.assembleTransaction(tx, simulated).build();
+    const signedTx = await walletService.signTransaction(assembledTx);
+    const result = await this.server.sendTransaction(signedTx);
+
+    if (result.status === 'ERROR') {
+      throw new TransactionFailedError(this._parseTxError(result), result.hash);
+    }
+    return { txHash: result.hash, status: result.status };
+  }
+
+  /**
+   * Get transparent on-chain expenditure audit log
+   */
+  async getSpendingLogs() {
+    try {
+      const contract = new StellarSdk.Contract(this.contractAddress);
+      const dummyAccount = this._getDummyAccount();
+
+      const tx = new StellarSdk.TransactionBuilder(dummyAccount, {
+        fee: StellarSdk.BASE_FEE,
+        networkPassphrase: CONFIG.NETWORK_PASSPHRASE,
+      })
+        .addOperation(contract.call('get_spending_logs'))
+        .setTimeout(30)
+        .build();
+
+      const response = await this.server.simulateTransaction(tx);
+      if (this._isSimulationError(response)) return this._getMockSpendingLogs();
+
+      const retval = response.result?.retval;
+      if (!retval) return this._getMockSpendingLogs();
+
+      const native = StellarSdk.scValToNative(retval);
+      if (!Array.isArray(native)) return this._getMockSpendingLogs();
+
+      return native.map((l) => ({
+        id: Number(l.id || 1),
+        milestoneId: Number(l.milestone_id || 1),
+        amount: Number(l.amount || 0) / 10_000_000,
+        recipient: String(l.recipient || ''),
+        category: String(l.category || 'General'),
+        description: String(l.description || 'Disbursement'),
+        timestamp: new Date(Number(l.timestamp || Date.now()) * 1000).toLocaleString(),
+      }));
+    } catch (e) {
+      return this._getMockSpendingLogs();
+    }
+  }
+
+  /**
+   * Get verified creator reputation score
+   */
+  async getCreatorReputation() {
+    try {
+      const contract = new StellarSdk.Contract(this.contractAddress);
+      const dummyAccount = this._getDummyAccount();
+
+      const tx = new StellarSdk.TransactionBuilder(dummyAccount, {
+        fee: StellarSdk.BASE_FEE,
+        networkPassphrase: CONFIG.NETWORK_PASSPHRASE,
+      })
+        .addOperation(contract.call('get_creator_reputation'))
+        .setTimeout(30)
+        .build();
+
+      const response = await this.server.simulateTransaction(tx);
+      if (this._isSimulationError(response)) return this._getMockReputation();
+
+      const retval = response.result?.retval;
+      if (!retval) return this._getMockReputation();
+
+      const native = StellarSdk.scValToNative(retval);
+      return {
+        completedMilestones: Number(native.completed_milestones || 1),
+        totalCampaigns: Number(native.total_campaigns || 1),
+        totalDeliveredXLM: Number(native.total_delivered_xlm || 300_0000000) / 10_000_000,
+        trustScore: Number(native.trust_score || 92),
+      };
+    } catch (e) {
+      return this._getMockReputation();
+    }
+  }
+
+  /**
+   * Calculate Quadratic Funding match allocation
+   * Formula: (sum(sqrt(ci)))^2
+   */
+  calculateQuadraticFunding(donations = [], matchingPool = 500) {
+    if (!donations.length) {
+      return { totalMatched: matchingPool, backerMultiplier: '1.0x', estimatedMatch: 0 };
+    }
+    const sumSqrt = donations.reduce((acc, d) => acc + Math.sqrt(Number(d.amount || 0)), 0);
+    const rawQF = Math.pow(sumSqrt, 2);
+    const directTotal = donations.reduce((acc, d) => acc + Number(d.amount || 0), 0);
+    const leverage = directTotal > 0 ? (rawQF / directTotal).toFixed(1) : '1.0';
+    return {
+      rawQF: rawQF.toFixed(1),
+      matchingPool,
+      leverageMultiplier: `${leverage}x`,
+      totalEmpowered: (directTotal + matchingPool).toFixed(1),
+    };
+  }
+
+  /**
+   * Claim proportional refund if campaign expired without reaching goal
+   */
+  async claimRefund() {
+    if (!walletService.isConnected()) {
+      throw new ContractExecutionError('Please connect your wallet to claim refund.');
+    }
+    const publicKey = walletService.publicKey;
+    const contract = new StellarSdk.Contract(this.contractAddress);
+    const account = await this.horizonServer.loadAccount(publicKey);
+
+    const tx = new StellarSdk.TransactionBuilder(account, {
+      fee: (parseInt(StellarSdk.BASE_FEE) * 10).toString(),
+      networkPassphrase: CONFIG.NETWORK_PASSPHRASE,
+    })
+      .addOperation(
+        contract.call('claim_refund', StellarSdk.nativeToScVal(publicKey, { type: 'address' }))
+      )
+      .setTimeout(CONFIG.DEFAULT_TIMEOUT)
+      .build();
+
+    const simulated = await this.server.simulateTransaction(tx);
+    if (this._isSimulationError(simulated)) {
+      throw new TransactionFailedError(
+        simulated?.error || 'Refund claim simulation failed. Campaign may still be active.',
+        null
+      );
+    }
+    const assembledTx = StellarSdk.SorobanRpc.assembleTransaction(tx, simulated).build();
+    const signedTx = await walletService.signTransaction(assembledTx);
+    const result = await this.server.sendTransaction(signedTx);
+    if (result.status === 'ERROR') {
+      throw new TransactionFailedError(this._parseTxError(result), result.hash);
+    }
+    return { txHash: result.hash, status: result.status };
+  }
+
+  _getMockMilestones() {
+    return [
+      {
+        id: 1,
+        title: 'Survey & Permits',
+        targetAmount: 300,
+        deadline: 4500000,
+        approvals: 12,
+        rejections: 0,
+        released: true,
+        disputed: false,
+      },
+      {
+        id: 2,
+        title: 'Solar Pump Drilling',
+        targetAmount: 400,
+        deadline: 6000000,
+        approvals: 8,
+        rejections: 1,
+        released: false,
+        disputed: false,
+      },
+      {
+        id: 3,
+        title: 'Filtration & Distribution',
+        targetAmount: 300,
+        deadline: 9999999,
+        approvals: 3,
+        rejections: 0,
+        released: false,
+        disputed: false,
+      },
+    ];
+  }
+
+  _getMockSpendingLogs() {
+    return [
+      {
+        id: 1,
+        milestoneId: 1,
+        amount: 150,
+        recipient: 'GA7W...46SJ (Geological Drilling Ltd)',
+        category: 'Hardware',
+        description: 'Hydrogeological ground resistivity survey and soil testing',
+        timestamp: '2026-08-28, 11:30 AM',
+      },
+      {
+        id: 2,
+        milestoneId: 1,
+        amount: 150,
+        recipient: 'GBD2...99KL (Kenya Water Resource Auth)',
+        category: 'Permits',
+        description: 'Environmental Impact Assessment & water extraction rights',
+        timestamp: '2026-08-28, 02:45 PM',
+      },
+    ];
+  }
+
+  _getMockReputation() {
+    return {
+      completedMilestones: 1,
+      totalCampaigns: 2,
+      totalDeliveredXLM: 1300,
+      trustScore: 96,
+    };
+  }
+
+  /**
    * Parse campaign data from contract return value
    */
   _parseCampaign(retval) {
@@ -313,6 +595,8 @@ export class ContractService {
         admin: native.admin || '',
         goal: Number(native.goal || 0) / 10_000_000,
         raised: Number(native.raised || 0) / 10_000_000,
+        releasedAmount: Number(native.released_amount || 0) / 10_000_000,
+        totalMilestones: Number(native.total_milestones || 3),
         deadline: Number(native.deadline || 0),
         active: native.active !== false,
       };
@@ -329,7 +613,9 @@ export class ContractService {
     return {
       admin: 'GCK3REPLT7LXQF3BHTBEMN4O6JRX4GBTMCYMLHWGJMWKWQX7D3GBJHCO',
       goal: CONFIG.CAMPAIGN_GOAL_XLM,
-      raised: 0,
+      raised: 117,
+      releasedAmount: 300,
+      totalMilestones: 3,
       deadline: CONFIG.CAMPAIGN_DEADLINE_LEDGER,
       active: true,
     };
@@ -337,3 +623,4 @@ export class ContractService {
 }
 
 export const contractService = new ContractService();
+

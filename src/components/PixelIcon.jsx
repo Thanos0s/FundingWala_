@@ -125,8 +125,41 @@ export const PixelIcon = ({ name, className = "w-6 h-6", color = "currentColor" 
       <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ shapeRendering: 'crispEdges' }}>
         <path d="M4 2h6v2H4V2zM2 4h2v5H2V4zM4 9h6v2H4V9zM10 5h2v6h-2V5zM11 2h3v3h-3V2zM2 11h3v3H2v-3z" fill={color} />
       </svg>
+    ),
+
+    // Pixel Lock
+    lock: (
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ shapeRendering: 'crispEdges' }}>
+        <path d="M5 2h6v2H5V2zM4 4h2v3H4V4zM10 4h2v3h-2V4zM3 7h10v7H3V7z" fill={color} />
+        <path d="M7 9h2v2H7V9z" fill="#FFF" />
+      </svg>
+    ),
+
+    // Pixel Chart
+    chart: (
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ shapeRendering: 'crispEdges' }}>
+        <path d="M2 13h12v1H2v-1zM3 10h2v3H3v-3zM7 7h2v6H7V7zM11 4h2v9h-2V4z" fill={color} />
+      </svg>
+    ),
+
+    // Pixel Shield
+    shield: (
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ shapeRendering: 'crispEdges' }}>
+        <path d="M3 2h10v2H3V2zM2 4h12v5H2V4zM3 9h10v2H3V9zM4 11h8v2H4v-2zM6 13h4v1H6v-1zM7 14h2v1H7v-1z" fill={color} />
+        <path d="M7 4h2v6H7V4zM5 6h6v2H5V6z" fill="#FFF" />
+      </svg>
+    ),
+
+    // Pixel Sparkle
+    sparkle: (
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} style={{ shapeRendering: 'crispEdges' }}>
+        <path d="M7 1h2v4H7V1zM7 11h2v4H7v-4zM1 7h4v2H1V7zM11 7h4v2h-4V7zM5 5h2v2H5V5zM9 5h2v2H9V5zM5 9h2v2H5V9zM9 9h2v2H9V9z" fill={color} />
+      </svg>
     )
   };
 
   return icons[name] || icons.bread;
 };
+
+export default PixelIcon;
+
