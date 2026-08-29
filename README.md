@@ -15,9 +15,9 @@ A production-grade, retro-styled decentralized crowdfunding application built on
 
 **Initialization Transaction Hash:**
 ```
-1aeaf0680894e9de3d65d94771d7b128e1fdda501890140f718bc90cf67d2e84
+081c9718a87253003a7bb8d23fd4caa51c8f7840090e58401587e8cfa7392a50
 ```
-[View Init TX on Stellar Expert](https://stellar.expert/explorer/testnet/tx/1aeaf0680894e9de3d65d94771d7b128e1fdda501890140f718bc90cf67d2e84)
+[View Init TX on Stellar Expert](https://stellar.expert/explorer/testnet/tx/081c9718a87253003a7bb8d23fd4caa51c8f7840090e58401587e8cfa7392a50)
 
 ## 🌐 Live Demo & Video Presentation
 
