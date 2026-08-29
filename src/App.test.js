@@ -6,8 +6,12 @@ import { WalletConnect } from './components/WalletConnect';
 import { MilestoneEscrowPanel } from './components/MilestoneEscrowPanel';
 import { QuadraticFundingCard } from './components/QuadraticFundingCard';
 import { SoulboundBadges } from './components/SoulboundBadges';
+import { eventService } from './services/eventService';
 
 describe('FundingWala Advanced Web3 Test Suite', () => {
+  afterEach(async () => {
+    await eventService.cleanup();
+  });
   test('1. renders FundingWala header and navigation tabs', async () => {
     await act(async () => {
       render(<App />);

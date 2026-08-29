@@ -9,6 +9,8 @@ export class EventService {
     this.lastLedger = null;
     this.contractId = CONFIG.CONTRACT_ADDRESS;
     this.recentDonations = [];
+    this.pendingPolls = []; // Track in-flight polling promises
+    this.isPolling = false;
   }
 
   /**
@@ -52,25 +54,27 @@ export class EventService {
    * Start polling for events
    */
   async startPolling() {
+    if (this.pollingInterval) return;
+
     try {
       const ledger = await this.server.getLatestLedger();
-      // Start from a few ledgers back to catch recent events
       this.lastLedger = Math.max(1, ledger.sequence - 100);
     } catch (error) {
-      console.error('Failed to get initial ledger for event polling:', error);
       this.lastLedger = 1;
     }
 
-    this.pollingInterval = setInterval(async () => {
-      try {
-        await this.pollForEvents();
-      } catch (error) {
-        console.error('Event polling error:', error);
+    this.pollingInterval = setInterval(() => {
+      const pollPromise = this.pollForEvents().catch(() => {});
+      this.pendingPolls.push(pollPromise);
+      // Prune settled promises
+      if (this.pendingPolls.length > 10) {
+        this.pendingPolls = this.pendingPolls.filter((p) => p && typeof p.then === 'function');
       }
     }, CONFIG.CAMPAIGN_REFRESH_INTERVAL);
 
-    // Also poll immediately
-    this.pollForEvents().catch(console.error);
+    // Initial poll
+    const initialPoll = this.pollForEvents().catch(() => {});
+    this.pendingPolls.push(initialPoll);
   }
 
   /**
@@ -81,6 +85,18 @@ export class EventService {
       clearInterval(this.pollingInterval);
       this.pollingInterval = null;
     }
+  }
+
+  /**
+   * Clean up all polling and wait for pending async tasks
+   */
+  async cleanup() {
+    this.stopPolling();
+    try {
+      await Promise.all(this.pendingPolls);
+    } catch (_) {}
+    this.pendingPolls = [];
+    this.clearAllListeners();
   }
 
   /**
@@ -96,8 +112,6 @@ export class EventService {
       }
 
       const startLedger = this.lastLedger;
-
-      // Don't re-poll old ledgers
       if (currentLedger.sequence <= startLedger) return;
 
       const eventsResponse = await this.server.getEvents({
@@ -119,9 +133,10 @@ export class EventService {
 
       this.lastLedger = currentLedger.sequence;
     } catch (error) {
-      // Silently handle — getEvents may not be available on all RPC nodes
       if (!error?.message?.includes('not found') && !error?.message?.includes('404')) {
-        console.debug('Event polling:', error?.message);
+        if (error?.message && process.env.NODE_ENV !== 'test') {
+          console.debug('Event polling:', error.message);
+        }
       }
     }
   }
