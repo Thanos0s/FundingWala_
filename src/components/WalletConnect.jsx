@@ -36,16 +36,17 @@ export const WalletConnect = ({ onConnected }) => {
   };
 
   const getProviderIconName = (key) => {
+    if (key === 'demo') return 'flash';
     if (key === 'freighter') return 'rocket';
     if (key === 'albedo') return 'key';
-    if (key === 'xbull') return 'flash';
+    if (key === 'xbull') return 'wallet';
     return 'wallet';
   };
 
   // ── Connected State ──────────────────────────────────────────────────────
   if (connected) {
     return (
-      <div className="space-y-4 font-pixel-body">
+      <div id="wallet-connect-box" className="space-y-4 font-pixel-body">
         <div className="bg-[#D4E751] border-3 border-black p-4 shadow-[4px_4px_0px_0px_#000]">
           <div className="flex items-center justify-between mb-3 border-b-2 border-black pb-2">
             <div className="flex items-center space-x-2">
@@ -56,7 +57,7 @@ export const WalletConnect = ({ onConnected }) => {
             </div>
             <button
               onClick={disconnect}
-              className="text-xs bg-black text-white font-bold px-2 py-1 hover:bg-red-600"
+              className="text-xs bg-black text-white font-bold px-2 py-1 hover:bg-red-600 active:translate-x-0.5 active:translate-y-0.5"
             >
               DISCONNECT
             </button>
@@ -67,7 +68,7 @@ export const WalletConnect = ({ onConnected }) => {
               <span className="font-bold text-gray-700">WALLET:</span>
               <span className="font-bold bg-white px-2 py-0.5 border border-black uppercase flex items-center space-x-1">
                 <PixelIcon name={getProviderIconName(provider)} className="w-4 h-4" />
-                <span>{provider}</span>
+                <span>{provider === 'demo' ? '1-TAP TESTNET' : provider}</span>
               </span>
             </div>
 
@@ -92,7 +93,7 @@ export const WalletConnect = ({ onConnected }) => {
 
   // ── Disconnected State ───────────────────────────────────────────────────
   return (
-    <div className="space-y-5 font-pixel-body">
+    <div id="wallet-connect-box" className="space-y-5 font-pixel-body">
       <div className="border-b-3 border-black pb-3 flex items-center space-x-3">
         <PixelIcon name="wallet" className="w-6 h-6 flex-shrink-0" />
         <div className="flex-1 min-w-0">
@@ -115,25 +116,36 @@ export const WalletConnect = ({ onConnected }) => {
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {Object.entries(walletProviders).map(([key, info]) => {
           const installed = isProviderInstalled(key);
           const iconName = getProviderIconName(key);
+          const isDemo = key === 'demo';
 
           return (
             <button
               key={key}
+              type="button"
               onClick={() => handleConnect(key)}
               disabled={loading}
-              className={`w-full flex items-center justify-between p-4 border-3 border-black shadow-[3px_3px_0px_0px_#000] transition-all text-left ${
-                installed
-                  ? 'bg-white hover:bg-yellow-100 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_#000]'
-                  : 'bg-gray-100 opacity-80'
+              className={`w-full flex items-center justify-between p-3.5 border-3 border-black shadow-[3px_3px_0px_0px_#000] transition-all text-left active:translate-x-0.5 active:translate-y-0.5 ${
+                isDemo
+                  ? 'bg-[#FEF9C3] hover:bg-[#FDE047]'
+                  : installed
+                  ? 'bg-white hover:bg-yellow-100 hover:translate-x-[-2px] hover:translate-y-[-2px]'
+                  : 'bg-gray-100 opacity-90'
               }`}
             >
               <div className="flex items-center space-x-3 min-w-0">
-                <div className="w-9 h-9 bg-black text-white border border-black flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0px_0px_#000]">
-                  <PixelIcon name={iconName} className="w-5 h-5 text-[#D4E751]" />
+                <div
+                  className={`w-9 h-9 border border-black flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0px_0px_#000] ${
+                    isDemo ? 'bg-[#D4E751] text-black' : 'bg-black text-white'
+                  }`}
+                >
+                  <PixelIcon
+                    name={iconName}
+                    className={`w-5 h-5 ${isDemo ? 'text-black' : 'text-[#D4E751]'}`}
+                  />
                 </div>
                 <div className="min-w-0">
                   <p className="font-pixel-heading text-xs font-bold mb-1 truncate">{info.name}</p>
@@ -145,6 +157,10 @@ export const WalletConnect = ({ onConnected }) => {
                 {loading ? (
                   <span className="text-[10px] font-bold bg-yellow-300 px-2 py-1 border border-black">
                     CONNECTING...
+                  </span>
+                ) : isDemo ? (
+                  <span className="text-[10px] font-bold bg-black text-[#D4E751] px-2.5 py-1 border border-black">
+                    1-TAP ⚡
                   </span>
                 ) : installed ? (
                   <span className="text-[10px] font-bold bg-[#D4E751] text-black px-2.5 py-1 border border-black">

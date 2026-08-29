@@ -66,6 +66,14 @@ export const DonateForm = ({ connected, donationState, onDonate, onReset }) => {
       setFieldError(err);
       return;
     }
+    if (!connected) {
+      setFieldError('PLEASE CONNECT A WALLET ON THE LEFT TO CONFIRM DONATION.');
+      const walletEl = document.getElementById('wallet-connect-box');
+      if (walletEl) {
+        walletEl.scrollIntoView({ behavior: 'smooth' });
+      }
+      return;
+    }
     try {
       await onDonate(parseFloat(amount));
       setAmount('');
@@ -213,7 +221,7 @@ export const DonateForm = ({ connected, donationState, onDonate, onReset }) => {
               placeholder={`Min ${CONFIG.MIN_DONATION_XLM} XLM`}
               min={CONFIG.MIN_DONATION_XLM}
               step="0.1"
-              disabled={isSubmitting || !connected}
+              disabled={isSubmitting}
               className="pixel-input w-full pr-16 text-sm"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 font-pixel-heading text-xs font-bold bg-black text-white px-2 py-1">
@@ -239,8 +247,8 @@ export const DonateForm = ({ connected, donationState, onDonate, onReset }) => {
                   setAmount(String(preset));
                   setFieldError('');
                 }}
-                disabled={isSubmitting || !connected}
-                className={`pixel-btn px-4 py-2 text-xs ${
+                disabled={isSubmitting}
+                className={`pixel-btn px-4 py-2 text-xs active:translate-x-0.5 active:translate-y-0.5 ${
                   amount === String(preset)
                     ? 'bg-black text-white'
                     : 'bg-white text-black hover:bg-yellow-200'
@@ -255,13 +263,19 @@ export const DonateForm = ({ connected, donationState, onDonate, onReset }) => {
         {/* Action Button */}
         <button
           type="submit"
-          disabled={isSubmitting || !connected || !amount}
-          className="pixel-btn pixel-btn-success w-full py-4 text-sm md:text-base flex items-center justify-center space-x-2 mt-4"
+          disabled={isSubmitting || !amount}
+          className={`pixel-btn w-full py-4 text-sm md:text-base flex items-center justify-center space-x-2 mt-4 active:translate-x-0.5 active:translate-y-0.5 ${
+            connected
+              ? 'pixel-btn-success'
+              : 'pixel-btn-accent'
+          }`}
         >
           <PixelIcon name="heart" className="w-5 h-5" />
           <span>
             {isSubmitting
               ? 'PROCESSING...'
+              : !connected
+              ? `CONNECT & DONATE ${amount ? `${amount} XLM` : ''}`
               : `DONATE ${amount ? `${amount} XLM` : 'NOW'}`}
           </span>
         </button>

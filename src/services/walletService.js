@@ -14,26 +14,34 @@ import {
 
 // Wallet provider metadata
 export const WALLET_PROVIDERS = {
-  freighter: {
-    name: 'Freighter',
-    icon: '🚀',
-    color: 'from-blue-500 to-blue-700',
-    installUrl: 'https://www.freighter.app/',
-    description: 'Official Stellar wallet',
+  demo: {
+    name: '1-Tap Testnet Wallet',
+    icon: 'flash',
+    color: 'from-green-500 to-green-700',
+    installUrl: null,
+    description: 'Instant Mobile & Web Testnet Account',
+    isInstant: true,
   },
   albedo: {
-    name: 'Albedo',
-    icon: '🔑',
+    name: 'Albedo Web Signer',
+    icon: 'key',
     color: 'from-purple-500 to-purple-700',
     installUrl: 'https://albedo.link/',
-    description: 'Web-based Stellar signer',
+    description: 'Web-based signer (No app needed)',
+  },
+  freighter: {
+    name: 'Freighter Wallet',
+    icon: 'rocket',
+    color: 'from-blue-500 to-blue-700',
+    installUrl: 'https://www.freighter.app/',
+    description: 'Official browser extension',
   },
   xbull: {
-    name: 'xBull',
-    icon: '⚡',
+    name: 'xBull Wallet',
+    icon: 'wallet',
     color: 'from-yellow-500 to-orange-600',
     installUrl: 'https://xbull.app/',
-    description: 'Feature-rich Stellar wallet',
+    description: 'Stellar web & mobile wallet',
   },
 };
 
@@ -41,6 +49,7 @@ export class WalletService {
   constructor() {
     this.provider = null;
     this.publicKey = null;
+    this.demoKeypair = null;
     this.server = new StellarSdk.SorobanRpc.Server(CONFIG.SOROBAN_RPC_URL);
   }
 
@@ -48,9 +57,9 @@ export class WalletService {
    * Detect installed wallet providers
    */
   detectProviders() {
-    const providers = [];
-    if (this.isProviderInstalled('freighter')) providers.push('freighter');
+    const providers = ['demo'];
     if (this.isProviderInstalled('albedo')) providers.push('albedo');
+    if (this.isProviderInstalled('freighter')) providers.push('freighter');
     if (this.isProviderInstalled('xbull')) providers.push('xbull');
     return providers;
   }
@@ -60,13 +69,15 @@ export class WalletService {
    */
   isProviderInstalled(provider) {
     switch (provider) {
+      case 'demo':
+        return true;
+      case 'albedo':
+        return true; // Albedo is web-based via CDN and always works everywhere
       case 'freighter':
         return !!(
           typeof window !== 'undefined' &&
           (window.freighterApi || window.freighter || window.stellar)
         );
-      case 'albedo':
-        return !!(typeof window !== 'undefined' && window.albedo);
       case 'xbull':
         return !!(typeof window !== 'undefined' && (window.xBullSDK || window.xbull));
       default:
@@ -219,10 +230,46 @@ export class WalletService {
   }
 
   /**
+   * Connect with an instant ephemeral Testnet Keypair funded by Friendbot
+   */
+  async connectDemo() {
+    try {
+      let keypair = null;
+      const savedSecret = sessionStorage.getItem('demo_wallet_secret');
+      if (savedSecret) {
+        try {
+          keypair = StellarSdk.Keypair.fromSecret(savedSecret);
+        } catch (_) {}
+      }
+      if (!keypair) {
+        keypair = StellarSdk.Keypair.random();
+        sessionStorage.setItem('demo_wallet_secret', keypair.secret());
+        // Fund via Horizon Friendbot for instant 10,000 testnet XLM
+        try {
+          await fetch(`https://friendbot.stellar.org?addr=${encodeURIComponent(keypair.publicKey())}`);
+        } catch (e) {
+          console.warn('Friendbot funding error:', e);
+        }
+      }
+      this.provider = 'demo';
+      this.publicKey = keypair.publicKey();
+      this.demoKeypair = keypair;
+      sessionStorage.setItem('wallet_provider', 'demo');
+      sessionStorage.setItem('wallet_address', this.publicKey);
+
+      return { publicKey: this.publicKey };
+    } catch (err) {
+      throw new WalletConnectionError('Demo wallet creation failed: ' + err?.message);
+    }
+  }
+
+  /**
    * Connect wallet by provider name
    */
   async connect(provider) {
     switch (provider) {
+      case 'demo':
+        return this.connectDemo();
       case 'freighter':
         return this.connectFreighter();
       case 'albedo':
@@ -238,6 +285,22 @@ export class WalletService {
    * Sign a transaction with the connected wallet
    */
   async signTransaction(tx) {
+    if (this.provider === 'demo') {
+      if (!this.demoKeypair) {
+        const savedSecret = sessionStorage.getItem('demo_wallet_secret');
+        if (savedSecret) {
+          try {
+            this.demoKeypair = StellarSdk.Keypair.fromSecret(savedSecret);
+          } catch (_) {}
+        }
+      }
+      if (!this.demoKeypair) {
+        throw new WalletConnectionError('Demo wallet keys not found in session');
+      }
+      tx.sign(this.demoKeypair);
+      return tx;
+    }
+
     const xdr = tx.toXDR();
 
     if (this.provider === 'freighter') {

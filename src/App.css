@@ -52,6 +52,8 @@ body {
   cursor: pointer;
   transition: all 0.05s ease;
   user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .pixel-btn:hover:not(:disabled) {
@@ -190,9 +192,13 @@ svg {
   transform: translateX(-100%);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .mobile-drawer.open {
   transform: translateX(0);
+  pointer-events: auto;
+  visibility: visible;
 }
 
