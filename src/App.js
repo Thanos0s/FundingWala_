@@ -13,23 +13,29 @@ import { SpendingAuditLog } from './components/SpendingAuditLog';
 import { QuadraticFundingCard } from './components/QuadraticFundingCard';
 import { SoulboundBadges } from './components/SoulboundBadges';
 import { RefundPortal } from './components/RefundPortal';
+import { CreateCampaignForm } from './components/CreateCampaignForm';
 import { useCrowdfunding } from './hooks/useCrowdfunding';
 
 const NAV_TABS = [
   { id: 'campaign', label: 'CAMPAIGN & DONATE', icon: 'coin' },
+  { id: 'create', label: '+ CREATE CAMPAIGN', icon: 'sparkle' },
   { id: 'escrow', label: 'MILESTONE ESCROW', icon: 'lock' },
   { id: 'spending', label: 'SPENDING LOG', icon: 'chart' },
-  { id: 'qf', label: 'QUADRATIC POOL', icon: 'sparkle' },
+  { id: 'qf', label: 'QUADRATIC POOL', icon: 'heart' },
   { id: 'badges', label: 'SBT REPUTATION', icon: 'star' },
 ];
 
 function App() {
   const [walletConnected, setWalletConnected] = useState(false);
-  const [activeTab, setActiveTab] = useState('campaign'); // campaign | escrow | spending | qf | badges
+  const [activeTab, setActiveTab] = useState('campaign'); // campaign | create | escrow | spending | qf | badges
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const {
     campaign,
+    campaigns,
+    selectedCampaignId,
+    selectCampaign,
+    createCampaign,
     donations,
     milestones,
     spendingLogs,
@@ -216,7 +222,13 @@ function App() {
         {/* ── Tab Content ─────────────────────────────────────── */}
         {activeTab === 'campaign' && (
           <div className="space-y-6">
-            <CrowdfundingHero campaign={campaign} loadingCampaign={loadingCampaign} />
+            <CrowdfundingHero
+              campaign={campaign}
+              campaigns={campaigns}
+              onSelectCampaign={selectCampaign}
+              onOpenCreate={() => setActiveTab('create')}
+              loadingCampaign={loadingCampaign}
+            />
             <ProgressBar
               raised={campaign.raised}
               goal={campaign.goal}
@@ -293,6 +305,14 @@ function App() {
               </div>
             </div>
           </div>
+        )}
+
+        {activeTab === 'create' && (
+          <CreateCampaignForm
+            onCreateCampaign={createCampaign}
+            onSuccess={() => setActiveTab('campaign')}
+            connected={walletConnected}
+          />
         )}
 
         {activeTab === 'escrow' && (

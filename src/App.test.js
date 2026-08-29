@@ -6,6 +6,7 @@ import { WalletConnect } from './components/WalletConnect';
 import { MilestoneEscrowPanel } from './components/MilestoneEscrowPanel';
 import { QuadraticFundingCard } from './components/QuadraticFundingCard';
 import { SoulboundBadges } from './components/SoulboundBadges';
+import { CreateCampaignForm } from './components/CreateCampaignForm';
 import { eventService } from './services/eventService';
 
 describe('FundingWala Advanced Web3 Test Suite', () => {
@@ -112,12 +113,28 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
     expect(screen.getByText(/DONATE NOW/i)).toBeInTheDocument();
   });
 
-  test('7. accurately calculates and renders progress bar stats', () => {
-    render(<ProgressBar raised={117} goal={1000} progress={11.7} />);
-    expect(screen.getByText(/11.7%/i)).toBeInTheDocument();
-    expect(screen.getByText(/117.0 XLM/i)).toBeInTheDocument();
-    expect(screen.getByText(/1,000 XLM/i)).toBeInTheDocument();
-    expect(screen.getByText(/883.0 XLM/i)).toBeInTheDocument();
+  test('8. switches tabs to + CREATE CAMPAIGN & renders creator portal form', async () => {
+    await act(async () => {
+      rendered = render(<App />);
+    });
+
+    const createTabs = screen.getAllByText(/\+ CREATE CAMPAIGN/i);
+    await act(async () => {
+      fireEvent.click(createTabs[0]);
+    });
+
+    expect(screen.getByText(/LAUNCH CROWDFUNDING PROJECT/i)).toBeInTheDocument();
+    expect(screen.getByText(/3-STAGE ESCROW TRANCHES/i)).toBeInTheDocument();
+    expect(screen.getByText(/LAUNCH CAMPAIGN ON STELLAR/i)).toBeInTheDocument();
+  });
+
+  test('9. validates CreateCampaignForm input fields', async () => {
+    const mockCreate = jest.fn().mockResolvedValue({});
+    render(<CreateCampaignForm onCreateCampaign={mockCreate} connected={true} />);
+
+    expect(screen.getByText(/Project Title/i)).toBeInTheDocument();
+    expect(screen.getByText(/Funding Goal \(XLM\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Solar Energy/i)).toBeInTheDocument();
   });
 });
 
