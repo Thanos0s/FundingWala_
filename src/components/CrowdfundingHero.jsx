@@ -42,9 +42,9 @@ export const CrowdfundingHero = ({ campaign, loadingCampaign }) => {
       </p>
 
       {/* Stats Row — Retro Pixel Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
         {/* Goal Card */}
-        <div className="bg-[#D4E751] border-3 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+        <div className="bg-[#D4E751] border-3 border-black p-4 md:p-5 shadow-[4px_4px_0px_0px_#000]">
           <div className="flex items-center space-x-2 mb-2">
             <PixelIcon name="diamond" className="w-4 h-4" />
             <p className="text-xs font-bold font-pixel-body uppercase">Goal</p>
@@ -55,7 +55,7 @@ export const CrowdfundingHero = ({ campaign, loadingCampaign }) => {
         </div>
 
         {/* Raised Card */}
-        <div className="bg-green-300 border-3 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+        <div className="bg-green-300 border-3 border-black p-4 md:p-5 shadow-[4px_4px_0px_0px_#000]">
           <div className="flex items-center space-x-2 mb-2">
             <PixelIcon name="coin" className="w-4 h-4" />
             <p className="text-xs font-bold font-pixel-body uppercase">Raised</p>
@@ -66,7 +66,7 @@ export const CrowdfundingHero = ({ campaign, loadingCampaign }) => {
         </div>
 
         {/* Deadline Card */}
-        <div className="bg-blue-200 border-3 border-black p-5 shadow-[4px_4px_0px_0px_#000] col-span-2 md:col-span-1">
+        <div className="bg-blue-200 border-3 border-black p-4 md:p-5 shadow-[4px_4px_0px_0px_#000] col-span-1 sm:col-span-2 md:col-span-1">
           <div className="flex items-center space-x-2 mb-2">
             <PixelIcon name="star" className="w-4 h-4" />
             <p className="text-xs font-bold font-pixel-body uppercase">Deadline Ledger</p>
@@ -84,13 +84,13 @@ export const CrowdfundingHero = ({ campaign, loadingCampaign }) => {
       </div>
 
       {/* Contract link */}
-      <div className="mt-8 pt-5 border-t-2 border-black flex flex-wrap justify-between items-center text-xs font-pixel-body">
-        <span>CONTRACT ADDRESS:</span>
+      <div className="mt-6 md:mt-8 pt-4 md:pt-5 border-t-2 border-black flex flex-wrap justify-between items-center gap-2 text-xs font-pixel-body">
+        <span className="font-bold">CONTRACT ADDRESS:</span>
         <a
           href={`${CONFIG.STELLAR_EXPERT_URL}/contract/${CONFIG.CONTRACT_ADDRESS}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-mono bg-black text-[#D4E751] px-2.5 py-1 font-bold hover:underline shadow-[2px_2px_0px_0px_#000]"
+          className="font-mono bg-black text-[#D4E751] px-2.5 py-1 font-bold hover:underline shadow-[2px_2px_0px_0px_#000] truncate max-w-full sm:max-w-none"
         >
           {CONFIG.CONTRACT_ADDRESS.substring(0, 10)}...{CONFIG.CONTRACT_ADDRESS.slice(-6)} ↗
         </a>

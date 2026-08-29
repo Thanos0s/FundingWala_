@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { PixelIcon } from './PixelIcon';
 
 export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0 }) => {
@@ -36,7 +36,7 @@ export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0 }) => {
       </p>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
         <div className="border-3 border-black bg-gray-50 p-4 text-center shadow-[3px_3px_0px_0px_#000]">
           <div className="font-pixel-body text-xs text-gray-600 font-bold">MATCH POOL</div>
           <div className="font-pixel-heading text-sm md:text-base font-bold text-black mt-1.5">500 XLM</div>

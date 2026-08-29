@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { PixelIcon } from './PixelIcon';
 
 export const RefundPortal = ({
@@ -52,7 +52,7 @@ export const RefundPortal = ({
         FundingWala contracts enforce automatic refund rights. If a campaign misses its funding goal or milestone deadlines expire, backers can immediately claim their proportional unspent XLM.
       </p>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
         <div className="border-3 border-black bg-gray-50 p-4 shadow-[3px_3px_0px_0px_#000]">
           <div className="font-pixel-body text-xs text-gray-600 font-bold uppercase">ESCROW PROTECTION</div>
           <div className="font-mono text-sm md:text-base font-extrabold text-black mt-1">100% On-Chain Vault</div>

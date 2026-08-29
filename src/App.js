@@ -79,7 +79,7 @@ function App() {
         </header>
 
         {/* ── Navigation Tabs ─────────────────────────────────── */}
-        <nav className="flex flex-wrap gap-2.5 mb-6 font-pixel-body text-xs">
+        <nav className="flex overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap gap-2 md:gap-2.5 mb-6 font-pixel-body text-xs">
           {[
             { id: 'campaign', label: 'CAMPAIGN & DONATE', icon: 'coin' },
             { id: 'escrow', label: 'MILESTONE ESCROW', icon: 'lock' },
@@ -90,9 +90,9 @@ function App() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-3 font-bold border-3 border-black transition-all shadow-[4px_4px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 ${
+              className={`px-3 md:px-4 py-2.5 md:py-3 font-bold border-3 border-black transition-all shadow-[3px_3px_0px_0px_#000] md:shadow-[4px_4px_0px_0px_#000] whitespace-nowrap flex-shrink-0 active:translate-x-0.5 active:translate-y-0.5 ${
                 activeTab === tab.id
-                  ? 'bg-black text-[#D4E751] translate-x-[-2px] translate-y-[-2px] shadow-[6px_6px_0px_0px_#000]'
+                  ? 'bg-black text-[#D4E751] translate-x-[-2px] translate-y-[-2px] shadow-[5px_5px_0px_0px_#000]'
                   : 'bg-white text-black hover:bg-[#F3F4F6]'
               }`}
             >
