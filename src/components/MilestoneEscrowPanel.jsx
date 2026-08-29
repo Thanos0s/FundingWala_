@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { PixelIcon } from './PixelIcon';
 
 export const MilestoneEscrowPanel = ({
@@ -20,21 +20,26 @@ export const MilestoneEscrowPanel = ({
   };
 
   return (
-    <div className="bg-slate-900 border-4 border-slate-700 p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.6)]">
-      <div className="flex items-center justify-between border-b-2 border-slate-700 pb-3 mb-4">
-        <div className="flex items-center gap-2">
-          <PixelIcon name="lock" size={24} className="text-yellow-400" />
-          <h3 className="text-xl font-bold font-mono tracking-wider text-yellow-400">
-            MILESTONE ESCROW VAULT
-          </h3>
+    <div className="pixel-box p-6 md:p-8 bg-white font-pixel-body">
+      <div className="flex items-center justify-between border-b-3 border-black pb-4 mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-[#D4E751] border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+            <PixelIcon name="lock" className="w-6 h-6 text-black" />
+          </div>
+          <div>
+            <h3 className="font-pixel-heading text-sm md:text-base font-bold text-black uppercase">
+              MILESTONE ESCROW
+            </h3>
+            <p className="text-[10px] text-gray-600 font-bold mt-0.5">3-STAGE TRANCHE RELEASES</p>
+          </div>
         </div>
-        <span className="text-xs bg-yellow-400/20 text-yellow-300 font-mono px-2 py-1 border border-yellow-400/40">
-          3-STAGE TRANCHES
+        <span className="text-[10px] bg-black text-[#D4E751] font-bold px-2 py-1 border border-black">
+          ON-CHAIN VAULT
         </span>
       </div>
 
-      <p className="text-xs text-slate-400 font-mono mb-4 leading-relaxed">
-        Funds are locked in smart contract escrow and released in phases upon milestone completion and backer approval vote.
+      <p className="text-xs text-gray-700 font-bold mb-5 leading-relaxed">
+        Funds are locked in smart contract escrow and released in phases only when milestones are verified and approved by community backer vote.
       </p>
 
       <div className="space-y-4">
@@ -46,69 +51,67 @@ export const MilestoneEscrowPanel = ({
           return (
             <div
               key={m.id}
-              className={`border-2 p-3.5 transition-all ${
+              className={`border-3 border-black p-4 transition-all shadow-[3px_3px_0px_0px_#000] ${
                 m.released
-                  ? 'border-green-500/60 bg-green-950/20'
-                  : 'border-slate-700 bg-slate-800/40'
+                  ? 'bg-[#EBF7A7]'
+                  : 'bg-white'
               }`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono bg-slate-700 text-slate-200 px-1.5 py-0.5">
-                      STAGE {m.id}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[10px] bg-black text-white font-bold px-1.5 py-0.5">
+                      PHASE {m.id}
                     </span>
-                    <h4 className="font-bold text-white font-mono text-sm">{m.title}</h4>
+                    <h4 className="font-pixel-heading text-xs font-bold text-black">{m.title}</h4>
                   </div>
-                  <div className="text-xs text-slate-400 font-mono mt-1">
-                    Tranche: <span className="text-yellow-400 font-bold">{m.targetAmount} XLM</span>
+                  <div className="text-xs text-gray-700 font-bold mt-1.5">
+                    Tranche: <span className="font-pixel-heading text-black text-xs">{m.targetAmount} XLM</span>
                   </div>
                 </div>
 
-                <div className="text-right">
+                <div>
                   {m.released ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-mono bg-green-500/20 text-green-400 border border-green-500/40 px-2 py-0.5">
-                      ✓ RELEASED
+                    <span className="inline-flex items-center text-[10px] font-bold bg-green-600 text-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000]">
+                      RELEASED
                     </span>
                   ) : m.disputed ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-mono bg-red-500/20 text-red-400 border border-red-500/40 px-2 py-0.5">
-                      ⚠️ DISPUTED
+                    <span className="inline-flex items-center text-[10px] font-bold bg-red-600 text-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000]">
+                      DISPUTED
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5">
-                      🔒 IN ESCROW
+                    <span className="inline-flex items-center text-[10px] font-bold bg-[#D4E751] text-black border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000]">
+                      IN ESCROW
                     </span>
                   )}
                 </div>
               </div>
 
               {/* Voting Bar */}
-              <div className="mt-3 pt-2 border-t border-slate-700/60 flex items-center justify-between text-xs font-mono">
-                <div className="text-slate-400 flex items-center gap-2">
-                  <span>Approval:</span>
-                  <span className="text-green-400 font-bold">{approvalPct}%</span>
-                  <span className="text-slate-500">
-                    ({m.approvals} 👍 / {m.rejections} 👎)
+              <div className="mt-3 pt-3 border-t-2 border-black flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div className="text-gray-700 font-bold flex items-center space-x-2 text-[11px]">
+                  <span>APPROVAL:</span>
+                  <span className="text-black font-extrabold">{approvalPct}%</span>
+                  <span className="text-gray-500">
+                    ({m.approvals} YES / {m.rejections} NO)
                   </span>
                 </div>
 
                 {!m.released && (
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleVote(m.id, true)}
                       disabled={isVotingThis}
-                      className="px-2 py-1 text-[11px] font-bold bg-green-600 hover:bg-green-500 text-white border border-green-400 active:translate-y-0.5 transition-all disabled:opacity-50"
-                      title="Approve milestone release"
+                      className="pixel-btn bg-[#22C55E] text-white px-3 py-1 text-[10px] font-bold"
                     >
-                      {isVotingThis ? '...' : '👍 APPROVE'}
+                      {isVotingThis ? '...' : 'APPROVE'}
                     </button>
                     <button
                       onClick={() => handleVote(m.id, false)}
                       disabled={isVotingThis}
-                      className="px-2 py-1 text-[11px] font-bold bg-red-800 hover:bg-red-700 text-white border border-red-500 active:translate-y-0.5 transition-all disabled:opacity-50"
-                      title="Reject / Flag milestone"
+                      className="pixel-btn bg-[#EF4444] text-white px-3 py-1 text-[10px] font-bold"
                     >
-                      👎 FLAG
+                      FLAG
                     </button>
                   </div>
                 )}

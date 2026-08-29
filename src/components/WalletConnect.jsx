@@ -105,7 +105,7 @@ export const WalletConnect = ({ onConnected }) => {
         <div className="bg-red-100 border-2 border-black p-4 text-xs shadow-[2px_2px_0px_0px_#000]">
           <div className="flex justify-between items-start">
             <span className="font-bold font-pixel-heading text-[10px] text-red-900">
-              🔴 ERROR
+              ERROR
             </span>
             <button onClick={clearError} className="font-bold hover:opacity-70">
               ✕
@@ -168,7 +168,7 @@ export const WalletConnect = ({ onConnected }) => {
       </div>
 
       <p className="text-[10px] text-center font-bold text-gray-600 pt-3 border-t border-dashed border-gray-300 mt-2">
-        🔒 YOUR KEYS STAY SAFE IN YOUR WALLET
+        YOUR KEYS STAY SAFE IN YOUR WALLET
       </p>
     </div>
   );

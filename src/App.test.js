@@ -42,8 +42,8 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
       fireEvent.click(escrowTab);
     });
 
-    expect(screen.getByText(/MILESTONE ESCROW VAULT/i)).toBeInTheDocument();
-    expect(screen.getByText(/RISK MANAGEMENT & REFUND VAULT/i)).toBeInTheDocument();
+    expect(screen.getByText(/3-STAGE TRANCHE RELEASES/i)).toBeInTheDocument();
+    expect(screen.getByText(/BACKER PROTECTION/i)).toBeInTheDocument();
   });
 
   test('3. switches tabs to Quadratic Pool & renders formula calculator', async () => {
@@ -57,7 +57,7 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
     });
 
     expect(screen.getByText(/QUADRATIC MATCHING POOL/i)).toBeInTheDocument();
-    expect(screen.getByText(/GITCOIN ALGORITHM/i)).toBeInTheDocument();
+    expect(screen.getByText(/GITCOIN MATCHING ALGORITHM/i)).toBeInTheDocument();
   });
 
   test('4. switches tabs to SBT Reputation & renders soulbound badges', async () => {
@@ -70,7 +70,7 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
       fireEvent.click(badgesTab);
     });
 
-    expect(screen.getByText(/SOULBOUND BADGES & REPUTATION/i)).toBeInTheDocument();
+    expect(screen.getByText(/SOULBOUND BADGES/i)).toBeInTheDocument();
     expect(screen.getByText(/BRONZE SUPPORTER/i)).toBeInTheDocument();
     expect(screen.getByText(/GENESIS GUARDIAN/i)).toBeInTheDocument();
   });

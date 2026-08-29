@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { PixelIcon } from './PixelIcon';
 
 export const RefundPortal = ({
@@ -27,40 +27,45 @@ export const RefundPortal = ({
   };
 
   return (
-    <div className="bg-slate-900 border-4 border-slate-700 p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.6)]">
-      <div className="flex items-center justify-between border-b-2 border-slate-700 pb-3 mb-4">
-        <div className="flex items-center gap-2">
-          <PixelIcon name="shield" size={24} className="text-emerald-400" />
-          <h3 className="text-xl font-bold font-mono tracking-wider text-emerald-400">
-            RISK MANAGEMENT & REFUND VAULT
-          </h3>
+    <div className="pixel-box p-6 md:p-8 bg-white font-pixel-body">
+      <div className="flex items-center justify-between border-b-3 border-black pb-4 mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-[#D4E751] border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+            <PixelIcon name="shield" className="w-6 h-6 text-black" />
+          </div>
+          <div>
+            <h3 className="font-pixel-heading text-sm md:text-base font-bold text-black uppercase">
+              REFUND VAULT
+            </h3>
+            <p className="text-[10px] text-gray-600 font-bold mt-0.5">BACKER PROTECTION</p>
+          </div>
         </div>
-        <span className="text-xs bg-emerald-400/20 text-emerald-300 font-mono px-2 py-1 border border-emerald-400/40">
-          SMART CONTRACT GUARANTEE
+        <span className="text-[10px] bg-black text-[#D4E751] font-bold px-2 py-1 border border-black">
+          SMART GUARANTEE
         </span>
       </div>
 
-      <p className="text-xs text-slate-400 font-mono mb-4 leading-relaxed">
+      <p className="text-xs text-gray-700 font-bold mb-5 leading-relaxed">
         FundingWala contracts enforce automatic refund rights. If a campaign misses its funding goal or unreleased milestone deadlines expire, backers can immediately claim their proportional unspent XLM.
       </p>
 
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="border border-slate-700 bg-slate-800/40 p-3">
-          <div className="text-[11px] font-mono text-slate-400">ESCROW PROTECTION</div>
-          <div className="text-sm font-bold text-white font-mono mt-0.5">100% On-Chain Vault</div>
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <div className="border-3 border-black bg-[#F8F9FA] p-3 shadow-[2px_2px_0px_0px_#000]">
+          <div className="text-[10px] text-gray-600 font-bold uppercase">ESCROW PROTECTION</div>
+          <div className="text-xs font-bold text-black mt-1">100% On-Chain Vault</div>
         </div>
-        <div className="border border-slate-700 bg-slate-800/40 p-3">
-          <div className="text-[11px] font-mono text-slate-400">DISPUTE JURY DAO</div>
-          <div className="text-sm font-bold text-green-400 font-mono mt-0.5">Community Governed</div>
+        <div className="border-3 border-black bg-[#F8F9FA] p-3 shadow-[2px_2px_0px_0px_#000]">
+          <div className="text-[10px] text-gray-600 font-bold uppercase">DISPUTE JURY DAO</div>
+          <div className="text-xs font-bold text-black mt-1">Community Governed</div>
         </div>
       </div>
 
-      <div className="border border-slate-700 bg-slate-800/60 p-3.5 flex items-center justify-between">
+      <div className="border-3 border-black bg-white p-4 shadow-[3px_3px_0px_0px_#000] flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-xs font-bold text-white font-mono">
-            {isFailed ? '⚠️ CAMPAIGN REFUND AVAILABLE' : '🛡️ ACTIVE PROTECTION STATUS'}
+          <div className="font-pixel-heading text-xs font-bold text-black">
+            {isFailed ? 'CAMPAIGN REFUND AVAILABLE' : 'ACTIVE PROTECTION STATUS'}
           </div>
-          <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+          <div className="text-[11px] text-gray-600 font-bold mt-1">
             {isFailed
               ? 'Campaign goal was not reached before deadline.'
               : 'Funds are securely locked. Refunds activate if milestones fail.'}
@@ -70,10 +75,10 @@ export const RefundPortal = ({
         <button
           onClick={handleRefund}
           disabled={!isConnected || claiming}
-          className={`px-3 py-2 text-xs font-bold font-mono border transition-all ${
+          className={`pixel-btn px-4 py-2.5 text-xs font-bold ${
             isFailed
-              ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 border-amber-300 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] active:translate-y-0.5'
-              : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-white'
+              ? 'bg-[#FACC15] text-black hover:bg-[#FDE047]'
+              : 'bg-black text-[#D4E751]'
           } disabled:opacity-50`}
         >
           {claiming ? 'CLAIMING...' : 'CLAIM REFUND'}
@@ -82,15 +87,15 @@ export const RefundPortal = ({
 
       {claimStatus && (
         <div
-          className={`mt-3 p-2 text-xs font-mono border ${
+          className={`mt-4 p-3 text-xs font-bold border-2 border-black shadow-[2px_2px_0px_0px_#000] ${
             claimStatus.success
-              ? 'bg-green-950/40 border-green-500 text-green-300'
-              : 'bg-red-950/40 border-red-500 text-red-300'
+              ? 'bg-[#D4E751] text-black'
+              : 'bg-[#EF4444] text-white'
           }`}
         >
           {claimStatus.success
-            ? '✓ Refund successfully claimed from escrow vault!'
-            : `⚠️ ${claimStatus.error}`}
+            ? 'Refund successfully claimed from escrow vault'
+            : `Error: ${claimStatus.error}`}
         </div>
       )}
     </div>

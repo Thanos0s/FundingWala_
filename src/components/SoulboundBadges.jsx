@@ -1,10 +1,9 @@
-import React from 'react';
+﻿import React from 'react';
 import { PixelIcon } from './PixelIcon';
 
 export const SoulboundBadges = ({
   donorAmount = 0,
   creatorReputation = {},
-  userAddress = '',
 }) => {
   const badges = [
     {
@@ -12,9 +11,6 @@ export const SoulboundBadges = ({
       name: 'BRONZE SUPPORTER',
       min: 0.5,
       icon: 'star',
-      color: 'amber-600',
-      border: 'border-amber-600',
-      bg: 'bg-amber-950/40',
       unlocked: donorAmount >= 0.5,
       perk: 'Voting rights on milestone releases',
     },
@@ -23,9 +19,6 @@ export const SoulboundBadges = ({
       name: 'SILVER PATRON',
       min: 10,
       icon: 'wallet',
-      color: 'cyan-400',
-      border: 'border-cyan-500',
-      bg: 'bg-cyan-950/40',
       unlocked: donorAmount >= 10,
       perk: '2x Quadratic matching multiplier',
     },
@@ -34,81 +27,80 @@ export const SoulboundBadges = ({
       name: 'GOLD BENEFACTOR',
       min: 50,
       icon: 'coin',
-      color: 'yellow-400',
-      border: 'border-yellow-500',
-      bg: 'bg-yellow-950/40',
       unlocked: donorAmount >= 50,
-      perk: 'Multi-sig audit & dispute jury eligibility',
+      perk: 'Multi-sig audit and dispute jury eligibility',
     },
     {
       id: 'guardian',
       name: 'GENESIS GUARDIAN',
       min: 100,
       icon: 'shield',
-      color: 'purple-400',
-      border: 'border-purple-500',
-      bg: 'bg-purple-950/40',
       unlocked: donorAmount >= 100,
       perk: 'Permanent on-chain donor honor hall',
     },
   ];
 
   return (
-    <div className="bg-slate-900 border-4 border-slate-700 p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.6)]">
-      <div className="flex items-center justify-between border-b-2 border-slate-700 pb-3 mb-4">
-        <div className="flex items-center gap-2">
-          <PixelIcon name="star" size={24} className="text-pink-400" />
-          <h3 className="text-xl font-bold font-mono tracking-wider text-pink-400">
-            SOULBOUND BADGES & REPUTATION
-          </h3>
+    <div className="pixel-box p-6 md:p-8 bg-white font-pixel-body">
+      <div className="flex items-center justify-between border-b-3 border-black pb-4 mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-[#D4E751] border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
+            <PixelIcon name="star" className="w-6 h-6 text-black" />
+          </div>
+          <div>
+            <h3 className="font-pixel-heading text-sm md:text-base font-bold text-black uppercase">
+              SOULBOUND BADGES
+            </h3>
+            <p className="text-[10px] text-gray-600 font-bold mt-0.5">NON-TRANSFERABLE REPUTATION</p>
+          </div>
         </div>
-        <span className="text-xs bg-pink-400/20 text-pink-300 font-mono px-2 py-1 border border-pink-400/40">
-          NON-TRANSFERABLE SBT
+        <span className="text-[10px] bg-black text-[#D4E751] font-bold px-2 py-1 border border-black">
+          STELLAR SBT
         </span>
       </div>
 
       {/* Creator Trust Score Card */}
-      <div className="border-2 border-emerald-600 bg-emerald-950/30 p-3.5 mb-4 flex items-center justify-between">
+      <div className="border-3 border-black bg-[#EBF7A7] p-4 mb-5 shadow-[3px_3px_0px_0px_#000] flex items-center justify-between">
         <div>
-          <div className="text-[11px] font-mono text-emerald-300 font-bold uppercase tracking-wider">
+          <div className="text-xs font-bold text-black uppercase tracking-wider">
             Verified Creator Track Record
           </div>
-          <div className="text-xs text-slate-300 font-mono mt-0.5">
+          <div className="text-xs text-gray-700 font-bold mt-1">
             {creatorReputation.completedMilestones || 1} Delivered Milestones · 100% Audit Pass
           </div>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-black font-mono text-emerald-400">
+          <div className="font-pixel-heading text-xl font-extrabold text-black">
             {creatorReputation.trustScore || 96}%
           </div>
-          <div className="text-[10px] font-mono text-emerald-300">TRUST SCORE</div>
+          <div className="text-[10px] font-bold text-gray-800">TRUST SCORE</div>
         </div>
       </div>
 
-      <p className="text-xs text-slate-400 font-mono mb-3 leading-relaxed">
+      <p className="text-xs text-gray-700 font-bold mb-4 leading-relaxed">
         Soulbound Tokens (SBTs) are minted to your Stellar account upon donation. They cannot be transferred or sold, proving your decentralized patronage track record.
       </p>
 
       {/* Donor Badges Grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {badges.map((b) => (
           <div
             key={b.id}
-            className={`border-2 p-2.5 flex flex-col justify-between transition-all ${
+            className={`border-3 border-black p-4 flex flex-col justify-between transition-all shadow-[3px_3px_0px_0px_#000] ${
               b.unlocked
-                ? `${b.border} ${b.bg} shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)]`
-                : 'border-slate-800 bg-slate-900/60 opacity-50 grayscale'
+                ? 'bg-white'
+                : 'bg-gray-100 opacity-60'
             }`}
           >
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <PixelIcon name={b.icon} size={18} className={`text-${b.color}`} />
-                <span className="text-[10px] font-mono font-bold text-slate-300">
-                  {b.unlocked ? '✓ UNLOCKED' : `${b.min} XLM`}
+              <div className="flex items-center justify-between mb-2">
+                <PixelIcon name={b.icon} className="w-6 h-6 text-black" />
+                <span className="text-[10px] font-bold bg-black text-white px-2 py-0.5">
+                  {b.unlocked ? 'UNLOCKED' : `${b.min} XLM`}
                 </span>
               </div>
-              <h5 className="font-bold text-xs font-mono text-white tracking-wide">{b.name}</h5>
-              <p className="text-[10px] text-slate-400 font-mono mt-1 leading-snug">{b.perk}</p>
+              <h5 className="font-pixel-heading text-xs font-bold text-black">{b.name}</h5>
+              <p className="text-xs text-gray-600 font-bold mt-1.5">{b.perk}</p>
             </div>
           </div>
         ))}

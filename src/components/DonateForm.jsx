@@ -8,7 +8,7 @@ import { PixelIcon } from './PixelIcon';
 const ERROR_DISPLAY = {
   WALLET_CONNECTION: {
     icon: 'alert',
-    label: '🔴 WALLET CONNECTION ERROR',
+    label: 'WALLET CONNECTION ERROR',
     bgColor: 'bg-red-100',
     borderColor: 'border-red-600',
     titleColor: 'text-red-900',
@@ -16,7 +16,7 @@ const ERROR_DISPLAY = {
   },
   CONTRACT_EXECUTION: {
     icon: 'alert',
-    label: '🟠 CONTRACT EXECUTION ERROR',
+    label: 'CONTRACT EXECUTION ERROR',
     bgColor: 'bg-orange-100',
     borderColor: 'border-orange-600',
     titleColor: 'text-orange-900',
@@ -24,7 +24,7 @@ const ERROR_DISPLAY = {
   },
   NETWORK: {
     icon: 'alert',
-    label: '🟡 NETWORK RPC ERROR',
+    label: 'NETWORK RPC ERROR',
     bgColor: 'bg-yellow-100',
     borderColor: 'border-yellow-600',
     titleColor: 'text-yellow-900',
@@ -32,7 +32,7 @@ const ERROR_DISPLAY = {
   },
   UNKNOWN: {
     icon: 'alert',
-    label: '⚠️ GENERAL ERROR',
+    label: 'GENERAL ERROR',
     bgColor: 'bg-gray-100',
     borderColor: 'border-gray-600',
     titleColor: 'text-gray-900',
@@ -125,7 +125,7 @@ export const DonateForm = ({ connected, donationState, onDonate, onReset }) => {
                   onClick={handleReset}
                   className="mt-2 bg-black text-yellow-300 px-2 py-1 font-bold hover:bg-gray-800"
                 >
-                  🔄 RETRY CONNECTION
+                  RETRY CONNECTION
                 </button>
               )}
             </div>
@@ -222,7 +222,7 @@ export const DonateForm = ({ connected, donationState, onDonate, onReset }) => {
           </div>
           {fieldError && (
             <p className="text-xs font-pixel-body font-bold text-red-600 mt-2 bg-red-50 p-2 border border-red-400">
-              ⚠️ {fieldError}
+              {fieldError}
             </p>
           )}
         </div>
