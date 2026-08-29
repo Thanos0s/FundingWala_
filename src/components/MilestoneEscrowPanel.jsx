@@ -75,15 +75,15 @@ export const MilestoneEscrowPanel = ({
 
                 <div>
                   {m.released ? (
-                    <span className="font-pixel-body text-xs font-bold bg-green-600 text-white border-2 border-black px-2.5 py-1 shadow-[2px_2px_0px_0px_#000]">
+                    <span className="font-pixel-body text-xs font-bold bg-[#D4E751] text-black border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000] inline-block">
                       RELEASED
                     </span>
                   ) : m.disputed ? (
-                    <span className="font-pixel-body text-xs font-bold bg-red-600 text-white border-2 border-black px-2.5 py-1 shadow-[2px_2px_0px_0px_#000]">
+                    <span className="font-pixel-body text-xs font-bold bg-red-500 text-white border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000] inline-block">
                       DISPUTED
                     </span>
                   ) : (
-                    <span className="font-pixel-body text-xs font-bold bg-[#D4E751] text-black border-2 border-black px-2.5 py-1 shadow-[2px_2px_0px_0px_#000]">
+                    <span className="font-pixel-body text-xs font-bold bg-[#FACC15] text-black border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000] inline-block">
                       IN ESCROW
                     </span>
                   )}
@@ -91,27 +91,27 @@ export const MilestoneEscrowPanel = ({
               </div>
 
               {/* Voting Bar */}
-              <div className="pt-3 border-t-2 border-black flex flex-wrap items-center justify-between gap-2 font-mono text-xs">
+              <div className="pt-3 border-t-2 border-black flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
                 <div className="text-gray-700 font-bold flex items-center space-x-2">
                   <span className="text-black font-extrabold">APPROVAL: {approvalPct}%</span>
-                  <span className="text-gray-500">
+                  <span className="text-gray-600 font-semibold">
                     ({m.approvals} YES / {m.rejections} NO)
                   </span>
                 </div>
 
                 {!m.released && (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2.5">
                     <button
                       onClick={() => handleVote(m.id, true)}
                       disabled={isVotingThis}
-                      className="pixel-btn bg-[#22C55E] text-white px-3 py-1.5 text-xs font-bold"
+                      className="pixel-btn pixel-btn-success px-4 py-1.5 text-xs font-extrabold border-2 border-black shadow-[2px_2px_0px_0px_#000] text-black"
                     >
                       {isVotingThis ? '...' : 'APPROVE'}
                     </button>
                     <button
                       onClick={() => handleVote(m.id, false)}
                       disabled={isVotingThis}
-                      className="pixel-btn bg-[#EF4444] text-white px-3 py-1.5 text-xs font-bold"
+                      className="pixel-btn pixel-btn-danger px-4 py-1.5 text-xs font-extrabold border-2 border-black shadow-[2px_2px_0px_0px_#000] text-white"
                     >
                       FLAG
                     </button>

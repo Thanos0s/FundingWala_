@@ -80,6 +80,11 @@ body {
   color: #000000;
 }
 
+.pixel-btn-danger {
+  background-color: #EF4444;
+  color: #ffffff;
+}
+
 .pixel-btn-accent {
   background-color: #FACC15;
   color: #000000;
@@ -87,7 +92,7 @@ body {
 
 .pixel-btn-dark {
   background-color: #000000;
-  color: #ffffff;
+  color: #D4E751;
 }
 
 /* Pixel Progress Bar */
