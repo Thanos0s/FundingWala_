@@ -288,19 +288,27 @@ export class ContractService {
         throw new RPCError('Could not load account from Stellar network: ' + error?.message);
       }
 
-      // Check recipient address validity; default to platform escrow / testnet treasury if not funded
+      // Verified funded testnet vault address
+      const VERIFIED_TESTNET_VAULT = 'GA4FLPVGYY77U6LVT4H73IOS44BOBQX4HLWIFGCFL5234DDLRGNIJT6U';
       let destination = campaign?.admin;
-      if (!destination || !StellarSdk.StrKey.isValidEd25519PublicKey(destination)) {
-        destination = 'GCK3REPLT7LXQF3BHTBEMN4O6JRX4GBTMCYMLHWGJMWKWQX7D3GBJHCO';
+
+      if (!destination || !StellarSdk.StrKey.isValidEd25519PublicKey(destination) || destination === publicKey) {
+        destination = VERIFIED_TESTNET_VAULT;
+      } else {
+        // Check if destination exists on Testnet Horizon; if not, auto-fund with Friendbot
+        try {
+          await this.horizonServer.loadAccount(destination);
+        } catch (_) {
+          try {
+            await fetch(`https://friendbot.stellar.org?addr=${encodeURIComponent(destination)}`);
+          } catch (_) {
+            destination = VERIFIED_TESTNET_VAULT;
+          }
+        }
       }
 
-      try {
-        await this.horizonServer.loadAccount(destination);
-      } catch (_) {
-        destination = 'GCK3REPLT7LXQF3BHTBEMN4O6JRX4GBTMCYMLHWGJMWKWQX7D3GBJHCO';
-      }
-
-      const memoText = `FW:${(campaign?.title || 'Crowdfund').substring(0, 20)}`;
+      const cleanTitle = (campaign?.title || 'Crowdfund').replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 18);
+      const memoText = `FW:${cleanTitle || 'Grant'}`;
 
       const tx = new StellarSdk.TransactionBuilder(account, {
         fee: StellarSdk.BASE_FEE,
@@ -321,7 +329,26 @@ export class ContractService {
       const signedTx = await walletService.signTransaction(tx);
 
       // Submit signed transaction to Stellar Testnet Horizon
-      const result = await this.horizonServer.submitTransaction(signedTx);
+      let result;
+      try {
+        result = await this.horizonServer.submitTransaction(signedTx);
+      } catch (submitErr) {
+        if (submitErr?.response?.data) {
+          const data = submitErr.response.data;
+          if (data.extras?.result_codes) {
+            const codes = data.extras.result_codes;
+            const opCodes = Array.isArray(codes.operations)
+              ? codes.operations.join(', ')
+              : (codes.operations || '');
+            const txCode = codes.transaction || '';
+            throw new ContractExecutionError(`Stellar transaction rejected: ${txCode} ${opCodes}`.trim());
+          }
+          if (data.detail) {
+            throw new ContractExecutionError(`Stellar transaction failed: ${data.detail}`);
+          }
+        }
+        throw submitErr;
+      }
 
       return {
         txHash: result.hash,

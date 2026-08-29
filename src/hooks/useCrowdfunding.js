@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import * as StellarSdk from '@stellar/stellar-sdk';
 import { contractService } from '../services/contractService';
 import { eventService } from '../services/eventService';
 import { CONFIG } from '../config';
@@ -86,8 +87,14 @@ export const useCrowdfunding = () => {
         throw new Error('Please provide valid title, description, and goal amount.');
       }
 
-      const creatorAddress =
-        walletService.publicKey || 'G_CREATOR_TESTNET_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      let creatorAddress = walletService.publicKey;
+      if (!creatorAddress || !StellarSdk.StrKey.isValidEd25519PublicKey(creatorAddress)) {
+        const newKp = StellarSdk.Keypair.random();
+        creatorAddress = newKp.publicKey();
+        try {
+          fetch(`https://friendbot.stellar.org?addr=${creatorAddress}`).catch(() => {});
+        } catch (_) {}
+      }
 
       const m1Amt = Math.round((goalNum * 30) / 100);
       const m2Amt = Math.round((goalNum * 40) / 100);
