@@ -1,0 +1,154 @@
+/* Pixel Retro Theme Rules */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap');
+
+:root {
+  --pixel-bg: #D4E751;
+  --pixel-card: #FFFFFF;
+  --pixel-black: #000000;
+  --pixel-blue: #3B82F6;
+  --pixel-green: #22C55E;
+  --pixel-yellow: #FACC15;
+  --pixel-red: #EF4444;
+  --font-pixel-heading: 'Press Start 2P', monospace;
+  --font-pixel-body: 'Silkscreen', monospace;
+}
+
+body {
+  margin: 0;
+  background-color: var(--pixel-bg);
+  background-image: 
+    radial-gradient(#000000 1px, transparent 0),
+    radial-gradient(#000000 1px, #D4E751 0);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+  color: var(--pixel-black);
+  font-family: var(--font-pixel-body);
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+/* Retro Pixel Box / Card */
+.pixel-box {
+  background-color: #ffffff;
+  border: 4px solid #000000;
+  box-shadow: 6px 6px 0px 0px #000000;
+  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.pixel-box-sm {
+  background-color: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+/* Pixel Button */
+.pixel-btn {
+  font-family: var(--font-pixel-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+  cursor: pointer;
+  transition: all 0.05s ease;
+  user-select: none;
+}
+
+.pixel-btn:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.pixel-btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.pixel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.pixel-btn-primary {
+  background-color: #3B82F6;
+  color: #ffffff;
+}
+
+.pixel-btn-success {
+  background-color: #22C55E;
+  color: #000000;
+}
+
+.pixel-btn-accent {
+  background-color: #FACC15;
+  color: #000000;
+}
+
+.pixel-btn-dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Pixel Progress Bar */
+.pixel-progress-track {
+  border: 3px solid #000000;
+  background-color: #ffffff;
+  padding: 3px;
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+.pixel-progress-fill {
+  background-color: #22C55E;
+  height: 100%;
+  border-right: 3px solid #000000;
+  background-image: linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.15) 50%,
+    rgba(0, 0, 0, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 16px 16px;
+}
+
+/* Pixel Input */
+.pixel-input {
+  font-family: var(--font-pixel-body);
+  border: 3px solid #000000;
+  box-shadow: 3px 3px 0px 0px #000000;
+  padding: 10px 14px;
+  background-color: #ffffff;
+  color: #000000;
+  outline: none;
+}
+
+.pixel-input:focus {
+  background-color: #FEF9C3;
+  box-shadow: 5px 5px 0px 0px #000000;
+}
+
+/* Pixel Fonts Utility */
+.font-pixel-heading {
+  font-family: var(--font-pixel-heading);
+  line-height: 1.5;
+}
+
+.font-pixel-body {
+  font-family: var(--font-pixel-body);
+  line-height: 1.5;
+}
+
+/* Scattered decorative background pixel elements */
+.pixel-deco-square {
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border: 2px solid #000000;
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}

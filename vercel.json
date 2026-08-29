@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "env": {
+    "REACT_APP_CONTRACT_ADDRESS": "CBK6FGJ3DXHYFYUVHUDSLTXANQSSE6XN6LNLGEU6TC5LIWLSYR4OVO5V"
+  }
+}
