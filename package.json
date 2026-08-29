@@ -17,7 +17,7 @@
   "scripts": {
     "start": "cross-env HTTPS=true react-scripts start",
     "build": "cross-env DISABLE_ESLINT_PLUGIN=true react-scripts build",
-    "test": "cross-env CI=true react-scripts test --watchAll=false",
+    "test": "cross-env CI=true react-scripts test --watchAll=false --forceExit",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

@@ -9,12 +9,19 @@ import { SoulboundBadges } from './components/SoulboundBadges';
 import { eventService } from './services/eventService';
 
 describe('FundingWala Advanced Web3 Test Suite', () => {
+  let rendered = null;
+
   afterEach(async () => {
+    if (rendered && typeof rendered.unmount === 'function') {
+      rendered.unmount();
+      rendered = null;
+    }
     await eventService.cleanup();
   });
+
   test('1. renders FundingWala header and navigation tabs', async () => {
     await act(async () => {
-      render(<App />);
+      rendered = render(<App />);
     });
     const headerElements = screen.getAllByText(/FundingWala/i);
     expect(headerElements.length).toBeGreaterThan(0);
@@ -27,7 +34,7 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
 
   test('2. switches tabs to Milestone Escrow & displays tranche stages', async () => {
     await act(async () => {
-      render(<App />);
+      rendered = render(<App />);
     });
 
     const escrowTab = screen.getByText(/MILESTONE ESCROW/i);
@@ -41,7 +48,7 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
 
   test('3. switches tabs to Quadratic Pool & renders formula calculator', async () => {
     await act(async () => {
-      render(<App />);
+      rendered = render(<App />);
     });
 
     const qfTab = screen.getByText(/QUADRATIC POOL/i);
@@ -55,7 +62,7 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
 
   test('4. switches tabs to SBT Reputation & renders soulbound badges', async () => {
     await act(async () => {
-      render(<App />);
+      rendered = render(<App />);
     });
 
     const badgesTab = screen.getByText(/SBT REPUTATION/i);
