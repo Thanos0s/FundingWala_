@@ -32,51 +32,48 @@ export const CrowdfundingHero = ({
         </div>
       </div>
 
-      {/* Top Controls: Badge, Category, & Project Switcher */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-        <div className="flex items-center space-x-2">
-          <div className="inline-flex items-center space-x-2 bg-[#D4E751] border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000]">
-            <span className="w-3 h-3 bg-black animate-ping"></span>
-            <span className="text-xs font-bold font-pixel-body uppercase tracking-wider">
-              LIVE CAMPAIGN · STELLAR
-            </span>
-          </div>
-
-          <span className="text-[10px] font-bold bg-black text-[#D4E751] border-2 border-black px-2.5 py-1 font-pixel-body uppercase shadow-[2px_2px_0px_0px_#000]">
-            {campaignCategory}
+      {/* Top Controls: Badge, Category, Project Switcher & + New Campaign */}
+      <div className="flex flex-wrap items-center gap-2.5 mb-5 sm:pr-36">
+        <div className="inline-flex items-center space-x-2 bg-[#D4E751] border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000]">
+          <span className="w-2.5 h-2.5 bg-black animate-ping"></span>
+          <span className="text-xs font-bold font-pixel-body uppercase tracking-wider">
+            LIVE CAMPAIGN · STELLAR
           </span>
         </div>
 
-        {/* Project Switcher Dropdown & + New Project Shortcut */}
-        <div className="flex items-center space-x-2 font-pixel-body text-xs">
-          {campaigns.length > 1 && (
-            <div className="flex items-center space-x-1 bg-yellow-100 border-2 border-black px-2 py-1 shadow-[2px_2px_0px_0px_#000]">
-              <span className="font-bold text-[10px] text-gray-700 hidden sm:inline">PROJECT:</span>
-              <select
-                value={campaign?.id || ''}
-                onChange={(e) => onSelectCampaign && onSelectCampaign(e.target.value)}
-                className="bg-transparent font-bold text-xs outline-none cursor-pointer pr-1"
-                aria-label="Select active crowdfunding project"
-              >
-                {campaigns.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+        <span className="text-[10px] font-bold bg-black text-[#D4E751] border-2 border-black px-2.5 py-1 font-pixel-body uppercase shadow-[2px_2px_0px_0px_#000]">
+          {campaignCategory}
+        </span>
 
-          {onOpenCreate && (
-            <button
-              onClick={onOpenCreate}
-              className="pixel-btn pixel-btn-accent px-3 py-1 text-xs font-bold flex items-center space-x-1 shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5"
+        {/* Project Switcher Dropdown */}
+        {campaigns.length > 1 && (
+          <div className="flex items-center space-x-1 bg-yellow-100 border-2 border-black px-2.5 py-1 shadow-[2px_2px_0px_0px_#000] font-pixel-body text-xs">
+            <span className="font-bold text-[10px] text-gray-700">PROJECT:</span>
+            <select
+              value={campaign?.id || ''}
+              onChange={(e) => onSelectCampaign && onSelectCampaign(e.target.value)}
+              className="bg-transparent font-bold text-xs outline-none cursor-pointer pr-1"
+              aria-label="Select active crowdfunding project"
             >
-              <PixelIcon name="sparkle" className="w-3.5 h-3.5 text-black" />
-              <span>+ NEW CAMPAIGN</span>
-            </button>
-          )}
-        </div>
+              {campaigns.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* + New Campaign Shortcut */}
+        {onOpenCreate && (
+          <button
+            onClick={onOpenCreate}
+            className="pixel-btn pixel-btn-accent px-3 py-1 text-xs font-bold flex items-center space-x-1.5 shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 font-pixel-body"
+          >
+            <PixelIcon name="sparkle" className="w-3.5 h-3.5 text-black" />
+            <span>+ NEW CAMPAIGN</span>
+          </button>
+        )}
       </div>
 
       {/* Main Title */}
