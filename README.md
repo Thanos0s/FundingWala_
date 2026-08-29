@@ -10,6 +10,15 @@ A production-grade, retro-styled decentralized crowdfunding application built on
 
 ---
 
+**View on Stellar Expert:**
+[https://stellar.expert/explorer/testnet/contract/CBK6FGJ3DXHYFYUVHUDSLTXANQSSE6XN6LNLGEU6TC5LIWLSYR4OVO5V](https://stellar.expert/explorer/testnet/contract/CBK6FGJ3DXHYFYUVHUDSLTXANQSSE6XN6LNLGEU6TC5LIWLSYR4OVO5V)
+
+**Initialization Transaction Hash:**
+```
+1aeaf0680894e9de3d65d94771d7b128e1fdda501890140f718bc90cf67d2e84
+```
+[View Init TX on Stellar Expert](https://stellar.expert/explorer/testnet/tx/1aeaf0680894e9de3d65d94771d7b128e1fdda501890140f718bc90cf67d2e84)
+
 ## 🌐 Live Demo & Video Presentation
 
 - 🚀 **Live Demo URL**: [https://stellar-02.vercel.app](https://fundingwala01.vercel.app/) *(or your deployed Vercel/Netlify URL)*
