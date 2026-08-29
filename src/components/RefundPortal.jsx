@@ -27,45 +27,48 @@ export const RefundPortal = ({
   };
 
   return (
-    <div className="pixel-box p-6 md:p-8 bg-white font-pixel-body">
-      <div className="flex items-center justify-between border-b-3 border-black pb-4 mb-4">
+    <div className="pixel-box p-6 md:p-8 bg-white">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b-3 border-black pb-4 mb-5">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-[#D4E751] border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000]">
-            <PixelIcon name="shield" className="w-6 h-6 text-black" />
+          <div className="w-12 h-12 bg-[#D4E751] border-3 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000] flex-shrink-0">
+            <PixelIcon name="shield" className="w-7 h-7 text-black" />
           </div>
           <div>
-            <h3 className="font-pixel-heading text-sm md:text-base font-bold text-black uppercase">
+            <h3 className="font-pixel-heading text-base md:text-lg font-bold text-black uppercase tracking-tight">
               REFUND VAULT
             </h3>
-            <p className="text-[10px] text-gray-600 font-bold mt-0.5">BACKER PROTECTION</p>
+            <p className="font-pixel-body text-xs text-gray-600 font-bold mt-1">
+              BACKER PROTECTION GUARANTEE
+            </p>
           </div>
         </div>
-        <span className="text-[10px] bg-black text-[#D4E751] font-bold px-2 py-1 border border-black">
+        <span className="font-pixel-body text-xs bg-black text-[#D4E751] font-bold px-3 py-1.5 border-2 border-black shadow-[2px_2px_0px_0px_#000]">
           SMART GUARANTEE
         </span>
       </div>
 
-      <p className="text-xs text-gray-700 font-bold mb-5 leading-relaxed">
-        FundingWala contracts enforce automatic refund rights. If a campaign misses its funding goal or unreleased milestone deadlines expire, backers can immediately claim their proportional unspent XLM.
+      <p className="font-mono text-xs md:text-sm text-gray-700 font-medium mb-6 leading-relaxed bg-yellow-50 border-2 border-black p-3.5 shadow-[2px_2px_0px_0px_#000]">
+        FundingWala contracts enforce automatic refund rights. If a campaign misses its funding goal or milestone deadlines expire, backers can immediately claim their proportional unspent XLM.
       </p>
 
-      <div className="grid grid-cols-2 gap-3 mb-5">
-        <div className="border-3 border-black bg-[#F8F9FA] p-3 shadow-[2px_2px_0px_0px_#000]">
-          <div className="text-[10px] text-gray-600 font-bold uppercase">ESCROW PROTECTION</div>
-          <div className="text-xs font-bold text-black mt-1">100% On-Chain Vault</div>
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="border-3 border-black bg-gray-50 p-4 shadow-[3px_3px_0px_0px_#000]">
+          <div className="font-pixel-body text-xs text-gray-600 font-bold uppercase">ESCROW PROTECTION</div>
+          <div className="font-mono text-sm md:text-base font-extrabold text-black mt-1">100% On-Chain Vault</div>
         </div>
-        <div className="border-3 border-black bg-[#F8F9FA] p-3 shadow-[2px_2px_0px_0px_#000]">
-          <div className="text-[10px] text-gray-600 font-bold uppercase">DISPUTE JURY DAO</div>
-          <div className="text-xs font-bold text-black mt-1">Community Governed</div>
+        <div className="border-3 border-black bg-gray-50 p-4 shadow-[3px_3px_0px_0px_#000]">
+          <div className="font-pixel-body text-xs text-gray-600 font-bold uppercase">DISPUTE JURY DAO</div>
+          <div className="font-mono text-sm md:text-base font-extrabold text-black mt-1">Community Governed</div>
         </div>
       </div>
 
-      <div className="border-3 border-black bg-white p-4 shadow-[3px_3px_0px_0px_#000] flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="font-pixel-heading text-xs font-bold text-black">
+      <div className="border-3 border-black bg-white p-5 shadow-[4px_4px_0px_0px_#000] flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="font-pixel-heading text-xs md:text-sm font-bold text-black">
             {isFailed ? 'CAMPAIGN REFUND AVAILABLE' : 'ACTIVE PROTECTION STATUS'}
           </div>
-          <div className="text-[11px] text-gray-600 font-bold mt-1">
+          <div className="font-mono text-xs text-gray-600 font-medium">
             {isFailed
               ? 'Campaign goal was not reached before deadline.'
               : 'Funds are securely locked. Refunds activate if milestones fail.'}
@@ -75,7 +78,7 @@ export const RefundPortal = ({
         <button
           onClick={handleRefund}
           disabled={!isConnected || claiming}
-          className={`pixel-btn px-4 py-2.5 text-xs font-bold ${
+          className={`pixel-btn px-5 py-3 text-xs md:text-sm font-bold ${
             isFailed
               ? 'bg-[#FACC15] text-black hover:bg-[#FDE047]'
               : 'bg-black text-[#D4E751]'
@@ -87,7 +90,7 @@ export const RefundPortal = ({
 
       {claimStatus && (
         <div
-          className={`mt-4 p-3 text-xs font-bold border-2 border-black shadow-[2px_2px_0px_0px_#000] ${
+          className={`mt-5 p-4 text-xs md:text-sm font-mono font-bold border-3 border-black shadow-[3px_3px_0px_0px_#000] ${
             claimStatus.success
               ? 'bg-[#D4E751] text-black'
               : 'bg-[#EF4444] text-white'
