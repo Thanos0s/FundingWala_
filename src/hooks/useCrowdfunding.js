@@ -357,13 +357,12 @@ export const useCrowdfunding = () => {
           }
           return result;
         } else {
-          // Custom campaign donation
-          const fakeTxHash =
-            'tx_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-          
+          // Real on-chain payment via user's connected wallet for custom campaign
+          const result = await contractService.donateCustom(amountXLM, selectedCampaign);
+
           setDonationState({
             status: 'confirmed',
-            txHash: fakeTxHash,
+            txHash: result.txHash,
             error: null,
             amountXLM,
           });
@@ -371,19 +370,23 @@ export const useCrowdfunding = () => {
           eventService.addLocalDonation(
             walletService.publicKey || 'G_DONOR_WALLET',
             amountXLM,
-            fakeTxHash
+            result.txHash
           );
 
-          setCustomCampaigns((prev) =>
-            prev.map((c) => {
+          setCustomCampaigns((prev) => {
+            const updated = prev.map((c) => {
               if (c.id !== selectedCampaign.id) return c;
               const newRaised = (c.raised || 0) + amountXLM;
               const progress = c.goal > 0 ? Math.min(100, (newRaised / c.goal) * 100) : 0;
               return { ...c, raised: newRaised, progress };
-            })
-          );
+            });
+            try {
+              localStorage.setItem('fundingwala_custom_campaigns', JSON.stringify(updated));
+            } catch (_) {}
+            return updated;
+          });
 
-          return { txHash: fakeTxHash, status: 'confirmed', amountXLM };
+          return result;
         }
       } catch (error) {
         const errorInfo = handleError(error);

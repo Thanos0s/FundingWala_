@@ -252,6 +252,97 @@ export class ContractService {
   }
 
   /**
+   * Donate to a custom campaign via a real on-chain Stellar payment transaction
+   * Prompts the connected wallet (Freighter / Albedo / xBull / 1-Tap) to sign and submit
+   */
+  async donateCustom(amountXLM, campaign) {
+    try {
+      if (!walletService.isConnected()) {
+        throw new ContractExecutionError('Please connect your wallet before donating.');
+      }
+
+      if (!amountXLM || isNaN(amountXLM) || amountXLM <= 0) {
+        throw new InvalidDonationError('Donation amount must be greater than 0 XLM.');
+      }
+
+      if (amountXLM < CONFIG.MIN_DONATION_XLM) {
+        throw new InvalidDonationError(
+          `Minimum donation is ${CONFIG.MIN_DONATION_XLM} XLM.`
+        );
+      }
+
+      const publicKey = walletService.publicKey;
+      const balance = await walletService.getBalance(publicKey);
+      const balanceNum = parseFloat(balance);
+      if (balanceNum < amountXLM + 1.5) {
+        throw new InsufficientBalanceError(
+          (amountXLM + 1.5).toFixed(2),
+          balanceNum.toFixed(2)
+        );
+      }
+
+      let account;
+      try {
+        account = await this.horizonServer.loadAccount(publicKey);
+      } catch (error) {
+        throw new RPCError('Could not load account from Stellar network: ' + error?.message);
+      }
+
+      // Check recipient address validity; default to platform escrow / testnet treasury if not funded
+      let destination = campaign?.admin;
+      if (!destination || !StellarSdk.StrKey.isValidEd25519PublicKey(destination)) {
+        destination = 'GCK3REPLT7LXQF3BHTBEMN4O6JRX4GBTMCYMLHWGJMWKWQX7D3GBJHCO';
+      }
+
+      try {
+        await this.horizonServer.loadAccount(destination);
+      } catch (_) {
+        destination = 'GCK3REPLT7LXQF3BHTBEMN4O6JRX4GBTMCYMLHWGJMWKWQX7D3GBJHCO';
+      }
+
+      const memoText = `FW:${(campaign?.title || 'Crowdfund').substring(0, 20)}`;
+
+      const tx = new StellarSdk.TransactionBuilder(account, {
+        fee: StellarSdk.BASE_FEE,
+        networkPassphrase: CONFIG.NETWORK_PASSPHRASE,
+      })
+        .addOperation(
+          StellarSdk.Operation.payment({
+            destination,
+            asset: StellarSdk.Asset.native(),
+            amount: Number(amountXLM).toFixed(7),
+          })
+        )
+        .addMemo(StellarSdk.Memo.text(memoText))
+        .setTimeout(CONFIG.DEFAULT_TIMEOUT)
+        .build();
+
+      // Sign transaction with connected wallet (triggers wallet approval popup)
+      const signedTx = await walletService.signTransaction(tx);
+
+      // Submit signed transaction to Stellar Testnet Horizon
+      const result = await this.horizonServer.submitTransaction(signedTx);
+
+      return {
+        txHash: result.hash,
+        status: 'SUCCESS',
+        amountXLM,
+      };
+    } catch (error) {
+      if (
+        error instanceof ContractExecutionError ||
+        error instanceof NetworkError
+      ) {
+        throw error;
+      }
+      console.error('Custom donate error:', error);
+      throw new ContractExecutionError(
+        'Donation transaction failed: ' + (error?.message || 'Transaction rejected by wallet')
+      );
+    }
+  }
+
+  /**
    * Directly get raw transaction status from Soroban JSON-RPC (bypasses SDK TransactionMeta v4 parsing bug)
    */
   async getTransactionStatus(txHash) {
