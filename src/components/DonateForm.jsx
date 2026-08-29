@@ -178,7 +178,7 @@ export const DonateForm = ({ connected, donationState, onDonate, onReset }) => {
     <div className="pixel-box p-6 md:p-8 bg-white space-y-6">
       <div className="flex items-center space-x-3 border-b-3 border-black pb-4">
         <PixelIcon name="coin" className="w-6 h-6 flex-shrink-0" />
-        <div>
+        <div className="flex-1 min-w-0">
           <h2 className="font-pixel-heading text-base font-bold">MAKE A DONATION</h2>
           <p className="text-xs font-pixel-body text-gray-600 mt-1">
             MINIMUM: {CONFIG.MIN_DONATION_XLM} XLM
@@ -191,7 +191,7 @@ export const DonateForm = ({ connected, donationState, onDonate, onReset }) => {
       {!connected && (
         <div className="bg-yellow-200 border-3 border-black p-4 flex items-center space-x-3 shadow-[3px_3px_0px_0px_#000]">
           <PixelIcon name="alert" className="w-6 h-6 flex-shrink-0" />
-          <div>
+          <div className="flex-1 min-w-0">
             <p className="font-pixel-heading text-xs font-bold">WALLET NOT CONNECTED</p>
             <p className="font-pixel-body text-xs mt-1 leading-relaxed">
               Connect a wallet using the panel on the left to donate.

@@ -25,11 +25,11 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
     });
     const headerElements = screen.getAllByText(/FundingWala/i);
     expect(headerElements.length).toBeGreaterThan(0);
-    expect(screen.getByText(/CAMPAIGN & DONATE/i)).toBeInTheDocument();
-    expect(screen.getByText(/MILESTONE ESCROW/i)).toBeInTheDocument();
-    expect(screen.getByText(/SPENDING LOG/i)).toBeInTheDocument();
-    expect(screen.getByText(/QUADRATIC POOL/i)).toBeInTheDocument();
-    expect(screen.getByText(/SBT REPUTATION/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/CAMPAIGN & DONATE/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/MILESTONE ESCROW/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/SPENDING LOG/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/QUADRATIC POOL/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/SBT REPUTATION/i).length).toBeGreaterThan(0);
   });
 
   test('2. switches tabs to Milestone Escrow & displays tranche stages', async () => {
@@ -37,9 +37,9 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
       rendered = render(<App />);
     });
 
-    const escrowTab = screen.getByText(/MILESTONE ESCROW/i);
+    const escrowTabs = screen.getAllByText(/MILESTONE ESCROW/i);
     await act(async () => {
-      fireEvent.click(escrowTab);
+      fireEvent.click(escrowTabs[0]);
     });
 
     expect(screen.getByText(/3-STAGE TRANCHE RELEASES/i)).toBeInTheDocument();
@@ -51,9 +51,9 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
       rendered = render(<App />);
     });
 
-    const qfTab = screen.getByText(/QUADRATIC POOL/i);
+    const qfTabs = screen.getAllByText(/QUADRATIC POOL/i);
     await act(async () => {
-      fireEvent.click(qfTab);
+      fireEvent.click(qfTabs[0]);
     });
 
     expect(screen.getByText(/QUADRATIC MATCHING POOL/i)).toBeInTheDocument();
@@ -65,9 +65,9 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
       rendered = render(<App />);
     });
 
-    const badgesTab = screen.getByText(/SBT REPUTATION/i);
+    const badgesTabs = screen.getAllByText(/SBT REPUTATION/i);
     await act(async () => {
-      fireEvent.click(badgesTab);
+      fireEvent.click(badgesTabs[0]);
     });
 
     expect(screen.getByText(/SOULBOUND BADGES/i)).toBeInTheDocument();
@@ -75,7 +75,30 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
     expect(screen.getByText(/GENESIS GUARDIAN/i)).toBeInTheDocument();
   });
 
-  test('5. validates donation form inputs and quick amounts', () => {
+  test('5. opens mobile 3-bar side drawer and switches view', async () => {
+    await act(async () => {
+      rendered = render(<App />);
+    });
+
+    // Click mobile menu button
+    const menuBtn = screen.getByLabelText(/Open navigation menu/i);
+    await act(async () => {
+      fireEvent.click(menuBtn);
+    });
+
+    // Drawer header should be present
+    expect(screen.getByText(/SELECT A VIEW/i)).toBeInTheDocument();
+
+    // Click Spending Log inside drawer
+    const spendingTabs = screen.getAllByText(/SPENDING LOG/i);
+    await act(async () => {
+      fireEvent.click(spendingTabs[spendingTabs.length - 1]);
+    });
+
+    expect(screen.getByText(/ON-CHAIN SPENDING LOG/i)).toBeInTheDocument();
+  });
+
+  test('6. validates donation form inputs and quick amounts', () => {
     const mockOnDonate = jest.fn();
     render(
       <DonateForm
@@ -89,7 +112,7 @@ describe('FundingWala Advanced Web3 Test Suite', () => {
     expect(screen.getByText(/DONATE NOW/i)).toBeInTheDocument();
   });
 
-  test('6. accurately calculates and renders progress bar stats', () => {
+  test('7. accurately calculates and renders progress bar stats', () => {
     render(<ProgressBar raised={117} goal={1000} progress={11.7} />);
     expect(screen.getByText(/11.7%/i)).toBeInTheDocument();
     expect(screen.getByText(/117.0 XLM/i)).toBeInTheDocument();

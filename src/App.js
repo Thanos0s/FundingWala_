@@ -15,9 +15,18 @@ import { SoulboundBadges } from './components/SoulboundBadges';
 import { RefundPortal } from './components/RefundPortal';
 import { useCrowdfunding } from './hooks/useCrowdfunding';
 
+const NAV_TABS = [
+  { id: 'campaign', label: 'CAMPAIGN & DONATE', icon: 'coin' },
+  { id: 'escrow', label: 'MILESTONE ESCROW', icon: 'lock' },
+  { id: 'spending', label: 'SPENDING LOG', icon: 'chart' },
+  { id: 'qf', label: 'QUADRATIC POOL', icon: 'sparkle' },
+  { id: 'badges', label: 'SBT REPUTATION', icon: 'star' },
+];
+
 function App() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [activeTab, setActiveTab] = useState('campaign'); // campaign | escrow | spending | qf | badges
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const {
     campaign,
@@ -36,6 +45,8 @@ function App() {
     refreshCampaign,
   } = useCrowdfunding();
 
+  const currentTab = NAV_TABS.find((t) => t.id === activeTab) || NAV_TABS[0];
+
   return (
     <div className="min-h-screen p-4 md:p-8 relative overflow-hidden">
       {/* Decorative Pixel Background Elements */}
@@ -48,26 +59,26 @@ function App() {
       <div className="max-w-7xl mx-auto relative z-10">
 
         {/* ── Retro Pixel Header Bar ──────────────────────────── */}
-        <header className="pixel-box bg-white p-5 md:p-6 mb-6 flex flex-wrap justify-between items-center gap-4">
+        <header className="pixel-box bg-white p-4 md:p-6 mb-6 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-[#D4E751] border-3 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_#000]">
+            <div className="w-12 h-12 bg-[#D4E751] border-3 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_#000] flex-shrink-0">
               <PixelIcon name="bread" className="w-8 h-8 text-black" />
             </div>
             <div>
-              <h1 className="font-pixel-heading text-xl md:text-2xl font-extrabold tracking-tight">
+              <h1 className="font-pixel-heading text-lg md:text-2xl font-extrabold tracking-tight">
                 FundingWala
               </h1>
-              <p className="font-pixel-body text-xs font-bold text-gray-600 mt-1">
+              <p className="font-pixel-body text-[10px] md:text-xs font-bold text-gray-600 mt-0.5 md:mt-1">
                 DECENTRALIZED PATRONAGE & ESCROW ON STELLAR
               </p>
             </div>
           </div>
 
-          {/* Network Badge */}
-          <div className="flex items-center space-x-3 font-pixel-body text-xs">
-            <div className="flex items-center space-x-2 bg-[#D4E751] border-2 border-black px-3 py-1.5 shadow-[2px_2px_0px_0px_#000]">
+          {/* Right Header Section: Network Badge & Mobile 3-Bar Button */}
+          <div className="flex items-center space-x-2 md:space-x-3 font-pixel-body text-xs">
+            <div className="flex items-center space-x-2 bg-[#D4E751] border-2 border-black px-2.5 md:px-3 py-1.5 shadow-[2px_2px_0px_0px_#000]">
               <span className="w-2.5 h-2.5 bg-black animate-ping" />
-              <span className="font-bold">STELLAR TESTNET</span>
+              <span className="font-bold text-[10px] md:text-xs">STELLAR TESTNET</span>
             </div>
             <div className="hidden sm:block text-right">
               <span className="font-bold block text-[10px] text-gray-600">CONTRACT</span>
@@ -75,18 +86,42 @@ function App() {
                 {CONFIG.CONTRACT_ADDRESS.substring(0, 10)}…
               </code>
             </div>
+
+            {/* Mobile 3-Bar (Hamburger) Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open navigation menu"
+              className="md:hidden pixel-btn bg-black text-[#D4E751] px-2.5 py-1.5 text-xs flex items-center space-x-1.5 shadow-[2px_2px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5"
+            >
+              <PixelIcon name="menu" className="w-4 h-4 text-[#D4E751]" />
+              <span className="font-bold text-[10px]">MENU</span>
+            </button>
           </div>
         </header>
 
-        {/* ── Navigation Tabs ─────────────────────────────────── */}
-        <nav className="flex overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap gap-2 md:gap-2.5 mb-6 font-pixel-body text-xs">
-          {[
-            { id: 'campaign', label: 'CAMPAIGN & DONATE', icon: 'coin' },
-            { id: 'escrow', label: 'MILESTONE ESCROW', icon: 'lock' },
-            { id: 'spending', label: 'SPENDING LOG', icon: 'chart' },
-            { id: 'qf', label: 'QUADRATIC POOL', icon: 'sparkle' },
-            { id: 'badges', label: 'SBT REPUTATION', icon: 'star' },
-          ].map((tab) => (
+        {/* ── Mobile Active Tab Bar (Mobile Only View) ────────── */}
+        <div className="md:hidden flex items-center justify-between bg-white border-3 border-black p-3 mb-6 shadow-[3px_3px_0px_0px_#000] font-pixel-body">
+          <div className="flex items-center space-x-2.5 min-w-0">
+            <div className="w-7 h-7 bg-[#D4E751] border-2 border-black flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0px_0px_#000]">
+              <PixelIcon name={currentTab.icon} className="w-4 h-4 text-black" />
+            </div>
+            <span className="font-bold text-xs truncate uppercase tracking-tight">
+              {currentTab.label}
+            </span>
+          </div>
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            aria-label="Select navigation tab"
+            className="pixel-btn pixel-btn-accent px-2.5 py-1 text-[11px] font-bold flex items-center space-x-1 flex-shrink-0"
+          >
+            <PixelIcon name="menu" className="w-3.5 h-3.5 text-black" />
+            <span>SWITCH</span>
+          </button>
+        </div>
+
+        {/* ── Desktop Navigation Tabs (PC View Only) ──────────── */}
+        <nav className="hidden md:flex flex-wrap gap-2 md:gap-2.5 mb-6 font-pixel-body text-xs">
+          {NAV_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -100,6 +135,83 @@ function App() {
             </button>
           ))}
         </nav>
+
+        {/* ── Mobile Side 3-Bar Drawer (Mobile Only) ──────────── */}
+        {isMobileMenuOpen && (
+          <div
+            className="mobile-drawer-backdrop md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+            role="presentation"
+          />
+        )}
+
+        <aside
+          className={`mobile-drawer md:hidden ${isMobileMenuOpen ? 'open' : ''}`}
+          aria-label="Mobile Navigation Drawer"
+        >
+          {/* Drawer Header */}
+          <div className="bg-[#D4E751] border-b-4 border-black p-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 bg-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000] flex-shrink-0">
+                <PixelIcon name="bread" className="w-5 h-5 text-black" />
+              </div>
+              <div>
+                <h2 className="font-pixel-heading text-xs font-bold text-black">NAVIGATION</h2>
+                <p className="font-pixel-body text-[10px] text-gray-700 font-bold">SELECT A VIEW</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              aria-label="Close navigation"
+              className="pixel-btn bg-black text-white w-8 h-8 flex items-center justify-center text-sm font-bold shadow-[2px_2px_0px_0px_#000] hover:bg-red-600 active:translate-x-0.5 active:translate-y-0.5"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Drawer Navigation List */}
+          <div className="p-4 space-y-3 flex-1 overflow-y-auto font-pixel-body">
+            {NAV_TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center space-x-3 p-3.5 border-3 border-black text-left transition-all active:translate-x-0.5 active:translate-y-0.5 ${
+                    isActive
+                      ? 'bg-black text-[#D4E751] shadow-[4px_4px_0px_0px_#000] translate-x-[-1px]'
+                      : 'bg-white text-black hover:bg-yellow-100 shadow-[3px_3px_0px_0px_#000]'
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 border-2 border-black flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0px_0px_#000] ${
+                      isActive ? 'bg-[#D4E751] text-black' : 'bg-gray-100 text-black'
+                    }`}
+                  >
+                    <PixelIcon name={tab.icon} className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-xs truncate">{tab.label}</p>
+                    {isActive && (
+                      <span className="text-[9px] bg-[#D4E751] text-black font-bold px-1.5 py-0.5 inline-block mt-1 border border-black">
+                        CURRENT VIEW
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Drawer Footer */}
+          <div className="p-4 border-t-3 border-black bg-gray-50 font-pixel-body text-[10px] text-center space-y-1">
+            <p className="font-bold text-black">STELLAR TESTNET PROTOCOL</p>
+            <p className="text-gray-600 font-mono">8-BIT PATRONAGE</p>
+          </div>
+        </aside>
 
         {/* ── Tab Content ─────────────────────────────────────── */}
         {activeTab === 'campaign' && (
