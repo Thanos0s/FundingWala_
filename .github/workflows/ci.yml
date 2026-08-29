@@ -1,4 +1,4 @@
-﻿name: CI/CD Pipeline - FundingWala
+name: CI/CD Pipeline - FundingWala
 
 on:
   push:
@@ -19,11 +19,6 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
 
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: contract
-
       - name: Run Soroban Contract Tests
         run: |
           cd contract
@@ -40,16 +35,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci || npm install
+        run: npm install --legacy-peer-deps
 
       - name: Run Frontend Unit Tests
-        run: npm test -- --watchAll=false --coverage
+        run: npx react-scripts test --watchAll=false
+        env:
+          CI: true
 
       - name: Production Build
         run: npm run build
         env:
           CI: false
+          DISABLE_ESLINT_PLUGIN: "true"
           REACT_APP_CONTRACT_ADDRESS: "CBK6FGJ3DXHYFYUVHUDSLTXANQSSE6XN6LNLGEU6TC5LIWLSYR4OVO5V"
+

@@ -1,5 +1,5 @@
-﻿import React from 'react';
-import PixelIcon from './PixelIcon';
+import React from 'react';
+import { PixelIcon } from './PixelIcon';
 
 export const SpendingAuditLog = ({ spendingLogs = [] }) => {
   return (

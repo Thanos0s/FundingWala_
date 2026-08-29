@@ -1,5 +1,5 @@
-﻿import React, { useState } from 'react';
-import PixelIcon from './PixelIcon';
+import React, { useState } from 'react';
+import { PixelIcon } from './PixelIcon';
 
 export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0 }) => {
   const [simDonors, setSimDonors] = useState(10);
