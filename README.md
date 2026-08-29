@@ -1,4 +1,4 @@
-# FundingWala — Production-Ready Crowdfunding dApp on Stellar (Level 3)
+# FundingWala — Crowdfunding dApp on Stellar
 
 [![CI/CD Pipeline](https://github.com/Thanos0s/FundingWala_/actions/workflows/ci.yml/badge.svg)](https://github.com/Thanos0s/FundingWala_/actions/workflows/ci.yml)
 ![Stellar Testnet](https://img.shields.io/badge/Network-Stellar%20Testnet-blue)
