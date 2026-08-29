@@ -95,7 +95,7 @@ export const WalletConnect = ({ onConnected }) => {
     <div className="space-y-5 font-pixel-body">
       <div className="border-b-3 border-black pb-3 flex items-center space-x-3">
         <PixelIcon name="wallet" className="w-6 h-6 flex-shrink-0" />
-        <div>
+        <div className="flex-1 min-w-0">
           <h3 className="font-pixel-heading text-sm font-bold uppercase">CONNECT WALLET</h3>
           <p className="text-[10px] text-gray-600 mt-1">SELECT YOUR STELLAR WALLET</p>
         </div>

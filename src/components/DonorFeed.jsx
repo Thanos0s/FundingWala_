@@ -77,14 +77,14 @@ export const DonorFeed = ({ donations }) => {
   return (
     <div className="pixel-box p-6 md:p-8 bg-white space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between border-b-3 border-black pb-4">
-        <div className="flex items-center space-x-2">
-          <PixelIcon name="peace" className="w-6 h-6" />
-          <h3 className="font-pixel-heading text-sm md:text-base font-bold uppercase">
+      <div className="flex items-center justify-between border-b-3 border-black pb-4 gap-2">
+        <div className="flex items-center space-x-2 min-w-0">
+          <PixelIcon name="peace" className="w-6 h-6 flex-shrink-0" />
+          <h3 className="font-pixel-heading text-sm md:text-base font-bold uppercase truncate">
             Recent Donors
           </h3>
         </div>
-        <div className="flex items-center space-x-1 bg-black text-[#D4E751] px-2 py-0.5 border border-black shadow-[2px_2px_0px_0px_#000]">
+        <div className="flex items-center space-x-1 bg-black text-[#D4E751] px-2 py-0.5 border border-black shadow-[2px_2px_0px_0px_#000] flex-shrink-0">
           <span className="w-2 h-2 bg-[#D4E751] animate-ping" />
           <span className="text-[10px] font-pixel-body font-bold">LIVE FEED</span>
         </div>
