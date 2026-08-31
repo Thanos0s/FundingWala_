@@ -12,6 +12,7 @@ export const WalletConnect = ({ onConnected }) => {
     provider,
     connect,
     disconnect,
+    refreshBalance,
     isProviderInstalled,
     walletProviders,
     clearError,
@@ -52,7 +53,7 @@ export const WalletConnect = ({ onConnected }) => {
             <div className="flex items-center space-x-2">
               <span className="w-2.5 h-2.5 bg-black animate-ping" />
               <span className="font-pixel-heading text-xs font-bold text-black uppercase">
-                CONNECTED
+                LIVE ON-CHAIN
               </span>
             </div>
             <button
@@ -63,27 +64,42 @@ export const WalletConnect = ({ onConnected }) => {
             </button>
           </div>
 
-          <div className="space-y-2 text-xs">
+          <div className="space-y-2.5 text-xs">
             <div className="flex justify-between items-center">
               <span className="font-bold text-gray-700">WALLET:</span>
               <span className="font-bold bg-white px-2 py-0.5 border border-black uppercase flex items-center space-x-1">
                 <PixelIcon name={getProviderIconName(provider)} className="w-4 h-4" />
-                <span>{provider === 'demo' ? '1-TAP TESTNET' : provider}</span>
+                <span>{provider === 'demo' ? '1-TAP TESTNET' : `${provider} (LIVE)`}</span>
               </span>
             </div>
 
             <div className="flex justify-between items-center">
               <span className="font-bold text-gray-700">ADDRESS:</span>
-              <code className="font-mono bg-white px-2 py-0.5 border border-black text-xs font-bold">
-                {formatAddress(address)}
-              </code>
+              <a
+                href={`https://stellar.expert/explorer/testnet/account/${address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="View on Stellar Expert Explorer"
+                className="font-mono bg-white px-2 py-0.5 border border-black text-xs font-bold underline hover:bg-yellow-100"
+              >
+                {formatAddress(address)} ↗
+              </a>
             </div>
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center pt-1 border-t border-black/20">
               <span className="font-bold text-gray-700">BALANCE:</span>
-              <span className="font-pixel-heading text-xs font-bold bg-black text-white px-2.5 py-1">
-                {parseFloat(balance).toFixed(2)} XLM
-              </span>
+              <div className="flex items-center space-x-1.5">
+                <span className="font-pixel-heading text-xs font-bold bg-black text-white px-2.5 py-1">
+                  {parseFloat(balance).toFixed(2)} XLM
+                </span>
+                <button
+                  onClick={refreshBalance}
+                  title="Refresh on-chain balance"
+                  className="bg-white border border-black p-1 hover:bg-yellow-200 active:translate-x-0.5 active:translate-y-0.5"
+                >
+                  <PixelIcon name="refresh" className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

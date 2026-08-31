@@ -5,6 +5,7 @@ import {
   WalletRejectionError,
 } from '../utils/errorHandler';
 import * as StellarSdk from '@stellar/stellar-sdk';
+import albedo from '@albedo-link/intent';
 import {
   isConnected as isFreighterConnected,
   requestAccess as requestFreighterAccess,
@@ -14,27 +15,19 @@ import {
 
 // Wallet provider metadata
 export const WALLET_PROVIDERS = {
-  demo: {
-    name: '1-Tap Testnet Wallet',
-    icon: 'flash',
-    color: 'from-green-500 to-green-700',
-    installUrl: null,
-    description: 'Instant Mobile & Web Testnet Account',
-    isInstant: true,
+  freighter: {
+    name: 'Freighter Wallet',
+    icon: 'rocket',
+    color: 'from-blue-500 to-blue-700',
+    installUrl: 'https://www.freighter.app/',
+    description: 'Official browser extension (Live on-chain)',
   },
   albedo: {
     name: 'Albedo Web Signer',
     icon: 'key',
     color: 'from-purple-500 to-purple-700',
     installUrl: 'https://albedo.link/',
-    description: 'Web-based signer (No app needed)',
-  },
-  freighter: {
-    name: 'Freighter Wallet',
-    icon: 'rocket',
-    color: 'from-blue-500 to-blue-700',
-    installUrl: 'https://www.freighter.app/',
-    description: 'Official browser extension',
+    description: 'Live Web & Mobile Signer (No extension needed)',
   },
   xbull: {
     name: 'xBull Wallet',
@@ -42,6 +35,14 @@ export const WALLET_PROVIDERS = {
     color: 'from-yellow-500 to-orange-600',
     installUrl: 'https://xbull.app/',
     description: 'Stellar web & mobile wallet',
+  },
+  demo: {
+    name: '1-Tap Instant Testnet Wallet',
+    icon: 'flash',
+    color: 'from-green-500 to-green-700',
+    installUrl: null,
+    description: 'Instant Ephemeral Testnet Account (10,000 XLM)',
+    isInstant: true,
   },
 };
 
@@ -174,13 +175,18 @@ export class WalletService {
    */
   async connectAlbedo() {
     try {
-      if (!window.albedo) {
+      const signer = typeof window !== 'undefined' && window.albedo ? window.albedo : albedo;
+      if (!signer || typeof signer.publicKey !== 'function') {
         throw new WalletNotFoundError('Albedo');
       }
 
-      const result = await window.albedo.publicKey({
+      const result = await signer.publicKey({
         require_existing: false,
       });
+
+      if (!result || !result.pubkey) {
+        throw new WalletRejectionError();
+      }
 
       this.provider = 'albedo';
       this.publicKey = result.pubkey;
@@ -189,7 +195,13 @@ export class WalletService {
 
       return { publicKey: result.pubkey };
     } catch (error) {
-      if (error instanceof WalletConnectionError) throw error;
+      if (
+        error instanceof WalletConnectionError ||
+        error instanceof WalletNotFoundError ||
+        error instanceof WalletRejectionError
+      ) {
+        throw error;
+      }
       if (error?.message?.includes('rejected') || error?.code === -1) {
         throw new WalletRejectionError();
       }
@@ -338,7 +350,8 @@ export class WalletService {
       return StellarSdk.TransactionBuilder.fromXDR(signedXdr, CONFIG.NETWORK_PASSPHRASE);
 
     } else if (this.provider === 'albedo') {
-      const result = await window.albedo.tx({
+      const signer = typeof window !== 'undefined' && window.albedo ? window.albedo : albedo;
+      const result = await signer.tx({
         xdr,
         network: 'testnet',
         submit: false,
