@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { PixelIcon } from './PixelIcon';
 
-export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0 }) => {
+export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0, onNavigateTab }) => {
   const [simDonors, setSimDonors] = useState(18);
   const [simAmount, setSimAmount] = useState(5);
+  const [personalPledge, setPersonalPledge] = useState(10);
   const MATCHING_POOL = 500;
 
   // Accurate Gitcoin QF Algorithm
@@ -14,9 +15,22 @@ export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0 }) => {
   const totalImpact = simulatedDirect + allocatedMatch;
   const leverageRatio = simulatedDirect > 0 ? (totalImpact / simulatedDirect).toFixed(1) : '1.0';
 
+  // Personal match estimation
+  const personalMatchBoost = Math.min(
+    150,
+    Math.round(Math.pow(Math.sqrt(personalPledge || 1) + 2, 2) * 2.5)
+  );
+  const totalPersonalImpact = (Number(personalPledge) || 0) + personalMatchBoost;
+
   const applyPreset = (donors, amount) => {
     setSimDonors(donors);
     setSimAmount(amount);
+  };
+
+  const handleGoDonate = () => {
+    if (onNavigateTab) {
+      onNavigateTab('campaign');
+    }
   };
 
   return (
@@ -107,12 +121,30 @@ export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0 }) => {
           </button>
         </div>
 
-        {/* Sliders */}
+        {/* Sliders & Steppers */}
         <div className="space-y-4 font-mono text-xs md:text-sm">
           <div>
             <div className="flex items-center justify-between text-gray-700 font-semibold mb-1.5">
               <span>Grassroots Donors (Unique Contributors):</span>
-              <strong className="text-black text-sm bg-yellow-100 px-2 py-0.5 border border-black">{simDonors} supporters</strong>
+              <div className="flex items-center space-x-1.5">
+                <button
+                  type="button"
+                  onClick={() => setSimDonors((p) => Math.max(1, p - 1))}
+                  className="w-6 h-6 bg-gray-200 border border-black font-bold flex items-center justify-center hover:bg-gray-300 active:translate-x-0.5"
+                >
+                  -
+                </button>
+                <strong className="text-black text-sm bg-yellow-100 px-2 py-0.5 border border-black">
+                  {simDonors} supporters
+                </strong>
+                <button
+                  type="button"
+                  onClick={() => setSimDonors((p) => Math.min(50, p + 1))}
+                  className="w-6 h-6 bg-gray-200 border border-black font-bold flex items-center justify-center hover:bg-gray-300 active:translate-x-0.5"
+                >
+                  +
+                </button>
+              </div>
             </div>
             <input
               type="range"
@@ -127,7 +159,25 @@ export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0 }) => {
           <div>
             <div className="flex items-center justify-between text-gray-700 font-semibold mb-1.5">
               <span>Average Pledge Per Donor:</span>
-              <strong className="text-black text-sm bg-yellow-100 px-2 py-0.5 border border-black">{simAmount} XLM</strong>
+              <div className="flex items-center space-x-1.5">
+                <button
+                  type="button"
+                  onClick={() => setSimAmount((p) => Math.max(1, p - 1))}
+                  className="w-6 h-6 bg-gray-200 border border-black font-bold flex items-center justify-center hover:bg-gray-300 active:translate-x-0.5"
+                >
+                  -
+                </button>
+                <strong className="text-black text-sm bg-yellow-100 px-2 py-0.5 border border-black">
+                  {simAmount} XLM
+                </strong>
+                <button
+                  type="button"
+                  onClick={() => setSimAmount((p) => Math.min(50, p + 1))}
+                  className="w-6 h-6 bg-gray-200 border border-black font-bold flex items-center justify-center hover:bg-gray-300 active:translate-x-0.5"
+                >
+                  +
+                </button>
+              </div>
             </div>
             <input
               type="range"
@@ -150,10 +200,61 @@ export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0 }) => {
             <span className="text-gray-600 block text-[10px] font-bold">MATCH SUBSIDY UNLOCKED</span>
             <span className="font-bold text-sm text-green-800">+{allocatedMatch} XLM</span>
           </div>
-          <div className="p-3 bg-black text-[#D4E751] border-2 border-black text-center shadow-[2px_2px_0px_0px_#000]">
-            <span className="text-gray-300 block text-[10px] font-bold">TOTAL PROJECT IMPACT</span>
-            <span className="font-pixel-heading font-bold text-sm text-[#D4E751]">{totalImpact} XLM</span>
+          <button
+            type="button"
+            onClick={handleGoDonate}
+            title="Click to go to Donation Portal"
+            className="p-3 bg-black text-[#D4E751] border-2 border-black text-center shadow-[2px_2px_0px_0px_#000] hover:bg-gray-900 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer group"
+          >
+            <span className="text-gray-300 block text-[10px] font-bold">TOTAL IMPACT (CLICK TO DONATE)</span>
+            <span className="font-pixel-heading font-bold text-sm text-[#D4E751] group-hover:underline">
+              {totalImpact} XLM ➔
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Personal Matching Contribution Booster */}
+      <div className="border-3 border-black bg-white p-5 shadow-[4px_4px_0px_0px_#000] space-y-4">
+        <div className="flex items-center justify-between border-b-2 border-black pb-2">
+          <span className="font-pixel-heading text-xs font-bold uppercase">
+            ⚡ YOUR PERSONAL MATCH BOOSTER
+          </span>
+          <span className="text-[10px] font-bold bg-yellow-200 px-2 py-0.5 border border-black">
+            INSTANT MATCH ESTIMATOR
+          </span>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="flex-1 w-full">
+            <label className="block text-[10px] font-bold text-gray-700 uppercase mb-1">
+              If You Donate:
+            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="number"
+                min="1"
+                max="1000"
+                value={personalPledge}
+                onChange={(e) => setPersonalPledge(Math.max(1, Number(e.target.value)))}
+                className="w-full text-sm font-mono font-bold p-2 border-2 border-black bg-yellow-50 focus:outline-none"
+              />
+              <span className="font-bold text-xs">XLM</span>
+            </div>
           </div>
+
+          <div className="flex-1 w-full p-2.5 bg-gray-50 border-2 border-black text-center">
+            <span className="text-[10px] text-gray-600 font-bold block">MATCH UNLOCKED FROM POOL</span>
+            <span className="font-pixel-heading text-xs text-green-700 font-bold">+{personalMatchBoost} XLM</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoDonate}
+            className="w-full sm:w-auto font-pixel-heading text-xs font-bold bg-[#D4E751] text-black border-2 border-black px-4 py-3 shadow-[2px_2px_0px_0px_#000] hover:bg-yellow-400 active:translate-x-0.5 active:translate-y-0.5 flex-shrink-0"
+          >
+            DONATE & UNLOCK {totalPersonalImpact} XLM ➔
+          </button>
         </div>
       </div>
 
@@ -184,4 +285,5 @@ export const QuadraticFundingCard = ({ qfMetrics = {}, donorCount = 0 }) => {
 };
 
 export default QuadraticFundingCard;
+
 

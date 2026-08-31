@@ -374,7 +374,11 @@ function App() {
 
         {activeTab === 'qf' && (
           <div className="max-w-3xl mx-auto">
-            <QuadraticFundingCard qfMetrics={qfMetrics} donorCount={donations.length} />
+            <QuadraticFundingCard
+              qfMetrics={qfMetrics}
+              donorCount={donations.length}
+              onNavigateTab={setActiveTab}
+            />
           </div>
         )}
 
