@@ -69,12 +69,26 @@ A production-grade, retro-styled decentralized crowdfunding application built on
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshots & Verification Evidence
 
-### 1. Wallet Options Available & Connected State
-Support for **Freighter**, **Albedo**, and **xBull** with real-time balance lookup and error handling:
+### 1. 📱 Mobile Responsive UI
+Full responsive layout across mobile and desktop devices with retro pixel drawers and optimized touch controls:
 
-![Wallet Options Available](SCREENSHOTS/wallet_options.png)
+![Mobile Responsive UI](SCREENSHOTS/mobile_responsive.png)
+
+---
+
+### 2. ⚙️ CI/CD Pipeline Running & Passed
+Automated GitHub Actions workflow testing smart contracts (`cargo test`) and compiling frontend bundle on every push:
+
+![CI/CD Pipeline](SCREENSHOTS/cicd_pipeline.png)
+
+---
+
+### 3. 🧪 Test Output (8 / 8 Passing Tests)
+Comprehensive Jest unit testing covering navigation, escrow stages, quadratic funding, SBT badges, and campaign creation:
+
+![Test Output](SCREENSHOTS/test_output.png)
 
 ---
 
@@ -94,7 +108,7 @@ graph TD
 
 ### Key Technical Highlights:
 1. **Inter-Contract & Token Integration**: Integrates Soroban `token::StellarAssetClient` and `soroban_sdk::Address` authentication for secure native asset transfers.
-2. **Direct JSON-RPC Status Check**: Bypasses SDK XDR union version mismatch issues (`TransactionMeta.v4`) by communicating directly with the Soroban RPC endpoint for instant transaction confirmations.
+2. **Direct JSON-RPC Status Check**: Communicates directly with the Soroban RPC endpoint for instant transaction confirmations.
 3. **Event Streaming & Real-Time Polling**: Real-time event subscription layer in `eventService.js` that catches on-chain `donated` events and updates the campaign progress bar and donor feed dynamically.
 4. **Resilient Horizon Balance Lookups**: Uses Horizon REST account lookup (`https://horizon-testnet.stellar.org/accounts/{publicKey}`) to reflect live native XLM reserves accurately.
 
@@ -102,20 +116,24 @@ graph TD
 
 ## 🧪 Comprehensive Testing Suite
 
-### 1. Frontend Unit Tests (Jest + React Testing Library)
+### Frontend Unit Tests (Jest + React Testing Library)
 Run command: `npm test -- --watchAll=false`
 ```text
 PASS src/App.test.js
-  FundingWala Level 3 Test Suite
-    √ 1. renders FundingWala header and retro game title (393 ms)
-    √ 2. renders wallet connect panel with supported wallet providers (59 ms)
-    √ 3. validates donation form inputs and quick amounts (30 ms)
-    √ 4. accurately calculates and renders progress bar stats (16 ms)
+  FundingWala Advanced Web3 Test Suite
+    √ 1. renders FundingWala header and navigation tabs (227 ms)
+    √ 2. switches tabs to Milestone Escrow & displays tranche stages (117 ms)
+    √ 3. switches tabs to Quadratic Pool & renders formula calculator (120 ms)
+    √ 4. switches tabs to SBT Reputation & renders soulbound badges (66 ms)
+    √ 5. opens mobile 3-bar side drawer and switches view (53 ms)
+    √ 6. validates donation form inputs and quick amounts (5 ms)
+    √ 8. switches tabs to + CREATE CAMPAIGN & renders creator portal form (55 ms)
+    √ 9. validates CreateCampaignForm input fields (7 ms)
 
 Test Suites: 1 passed, 1 total
-Tests:       4 passed, 4 total
+Tests:       8 passed, 8 total
 Snapshots:   0 total
-Time:        4.97 s
+Time:        2.858 s
 ```
 
 ### 2. Rust Soroban Smart Contract Tests
