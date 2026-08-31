@@ -16,33 +16,25 @@ import {
 // Wallet provider metadata
 export const WALLET_PROVIDERS = {
   freighter: {
-    name: 'Freighter Wallet',
+    name: 'Freighter',
     icon: 'rocket',
     color: 'from-blue-500 to-blue-700',
     installUrl: 'https://www.freighter.app/',
     description: 'Official browser extension (Live on-chain)',
   },
   albedo: {
-    name: 'Albedo Web Signer',
+    name: 'Albedo',
     icon: 'key',
     color: 'from-purple-500 to-purple-700',
     installUrl: 'https://albedo.link/',
     description: 'Live Web & Mobile Signer (No extension needed)',
   },
   xbull: {
-    name: 'xBull Wallet',
+    name: 'xBull',
     icon: 'wallet',
     color: 'from-yellow-500 to-orange-600',
     installUrl: 'https://xbull.app/',
     description: 'Stellar web & mobile wallet',
-  },
-  demo: {
-    name: '1-Tap Instant Testnet Wallet',
-    icon: 'flash',
-    color: 'from-green-500 to-green-700',
-    installUrl: null,
-    description: 'Instant Ephemeral Testnet Account (10,000 XLM)',
-    isInstant: true,
   },
 };
 
@@ -50,7 +42,6 @@ export class WalletService {
   constructor() {
     this.provider = null;
     this.publicKey = null;
-    this.demoKeypair = null;
     this.server = new StellarSdk.SorobanRpc.Server(CONFIG.SOROBAN_RPC_URL);
   }
 
@@ -58,9 +49,9 @@ export class WalletService {
    * Detect installed wallet providers
    */
   detectProviders() {
-    const providers = ['demo'];
-    if (this.isProviderInstalled('albedo')) providers.push('albedo');
+    const providers = [];
     if (this.isProviderInstalled('freighter')) providers.push('freighter');
+    if (this.isProviderInstalled('albedo')) providers.push('albedo');
     if (this.isProviderInstalled('xbull')) providers.push('xbull');
     return providers;
   }
@@ -297,40 +288,6 @@ export class WalletService {
   }
 
   /**
-   * Connect with an instant ephemeral Testnet Keypair funded by Friendbot
-   */
-  async connectDemo() {
-    try {
-      let keypair = null;
-      const savedSecret = sessionStorage.getItem('demo_wallet_secret');
-      if (savedSecret) {
-        try {
-          keypair = StellarSdk.Keypair.fromSecret(savedSecret);
-        } catch (_) {}
-      }
-      if (!keypair) {
-        keypair = StellarSdk.Keypair.random();
-        sessionStorage.setItem('demo_wallet_secret', keypair.secret());
-        // Fund via Horizon Friendbot for instant 10,000 testnet XLM
-        try {
-          await fetch(`https://friendbot.stellar.org?addr=${encodeURIComponent(keypair.publicKey())}`);
-        } catch (e) {
-          console.warn('Friendbot funding error:', e);
-        }
-      }
-      this.provider = 'demo';
-      this.publicKey = keypair.publicKey();
-      this.demoKeypair = keypair;
-      sessionStorage.setItem('wallet_provider', 'demo');
-      sessionStorage.setItem('wallet_address', this.publicKey);
-
-      return { publicKey: this.publicKey };
-    } catch (err) {
-      throw new WalletConnectionError('Demo wallet creation failed: ' + err?.message);
-    }
-  }
-
-  /**
    * Connect with a specific Stellar address (e.g. user Freighter public key)
    */
   async connectAddress(publicKey, provider = 'freighter') {
@@ -350,8 +307,6 @@ export class WalletService {
    */
   async connect(provider) {
     switch (provider) {
-      case 'demo':
-        return this.connectDemo();
       case 'freighter':
         return this.connectFreighter();
       case 'albedo':
@@ -367,22 +322,6 @@ export class WalletService {
    * Sign a transaction with the connected wallet
    */
   async signTransaction(tx) {
-    if (this.provider === 'demo') {
-      if (!this.demoKeypair) {
-        const savedSecret = sessionStorage.getItem('demo_wallet_secret');
-        if (savedSecret) {
-          try {
-            this.demoKeypair = StellarSdk.Keypair.fromSecret(savedSecret);
-          } catch (_) {}
-        }
-      }
-      if (!this.demoKeypair) {
-        throw new WalletConnectionError('Demo wallet keys not found in session');
-      }
-      tx.sign(this.demoKeypair);
-      return tx;
-    }
-
     const xdr = tx.toXDR();
 
     if (this.provider === 'freighter') {
