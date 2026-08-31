@@ -22,7 +22,7 @@ A production-grade, retro-styled decentralized crowdfunding application built on
 ## 🌐 Live Demo & Video Presentation
 
 - 🚀 **Live Demo URL**: [https://stellar-02.vercel.app](https://fundingwala01.vercel.app/) *(or your deployed Vercel/Netlify URL)*
-- 🎥 **Demo Video (1–2 min)**: [Demo Video Link](https://www.youtube.com/) *(Add your 1-2 minute walkthrough recording)*
+- 🎥 **Demo Video (1–2 min)**: [https://drive.google.com/file/d/1X9b07skw3UV03F26i3iILwFs3YH2ZIhU/view?usp=sharing]
 
 ---
 
