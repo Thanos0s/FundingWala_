@@ -51,12 +51,12 @@ export class ContractService {
   }
 
   /**
-   * Return a valid dummy account for read-only contract simulation
+   * Return a valid account for read-only contract simulation
    */
   _getDummyAccount() {
     return new StellarSdk.Account(
-      'GCK3REPLT7LXQF3BHTBEMN4O6JRX4GBTMCYMLHWGJMWKWQX7D3GBJHCO',
-      '0'
+      'GA4FLPVGYY77U6LVT4H73IOS44BOBQX4HLWIFGCFL5234DDLRGNIJT6U',
+      '100'
     );
   }
 

@@ -134,7 +134,6 @@ export const WalletConnect = ({ onConnected }) => {
 
       <div className="space-y-3">
         {Object.entries(walletProviders).map(([key, info]) => {
-          const installed = isProviderInstalled(key);
           const iconName = getProviderIconName(key);
           const isDemo = key === 'demo';
 
@@ -147,9 +146,7 @@ export const WalletConnect = ({ onConnected }) => {
               className={`w-full flex items-center justify-between p-3.5 border-3 border-black shadow-[3px_3px_0px_0px_#000] transition-all text-left active:translate-x-0.5 active:translate-y-0.5 ${
                 isDemo
                   ? 'bg-[#FEF9C3] hover:bg-[#FDE047]'
-                  : installed
-                  ? 'bg-white hover:bg-yellow-100 hover:translate-x-[-2px] hover:translate-y-[-2px]'
-                  : 'bg-gray-100 opacity-90'
+                  : 'bg-white hover:bg-yellow-100 hover:translate-x-[-2px] hover:translate-y-[-2px]'
               }`}
             >
               <div className="flex items-center space-x-3 min-w-0">
@@ -178,20 +175,11 @@ export const WalletConnect = ({ onConnected }) => {
                   <span className="text-[10px] font-bold bg-black text-[#D4E751] px-2.5 py-1 border border-black">
                     1-TAP ⚡
                   </span>
-                ) : installed ? (
-                  <span className="text-[10px] font-bold bg-[#D4E751] text-black px-2.5 py-1 border border-black">
-                    READY
-                  </span>
                 ) : (
-                  <a
-                    href={info.installUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-[10px] font-bold bg-black text-white px-2.5 py-1 underline hover:bg-gray-800 inline-block"
-                  >
-                    INSTALL ↗
-                  </a>
+                  <span className="text-[10px] font-bold bg-[#D4E751] text-black px-2.5 py-1 border border-black flex items-center space-x-1">
+                    <span>CONNECT</span>
+                    <span>➔</span>
+                  </span>
                 )}
               </div>
             </button>

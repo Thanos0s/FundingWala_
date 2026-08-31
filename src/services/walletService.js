@@ -114,39 +114,67 @@ export class WalletService {
         const accessObj = await requestFreighterAccess();
         if (accessObj && accessObj.address) {
           publicKey = accessObj.address;
-        } else if (typeof accessObj === 'string' && accessObj) {
+        } else if (typeof accessObj === 'string' && accessObj && !accessObj.includes('error')) {
           publicKey = accessObj;
+        } else if (accessObj && accessObj.error) {
+          if (
+            accessObj.error.includes('User declined') ||
+            accessObj.error.includes('rejected') ||
+            accessObj.error.includes('denied')
+          ) {
+            throw new WalletRejectionError();
+          }
         }
       } catch (e) {
-        // Fallback to getAddress
+        if (e instanceof WalletRejectionError) throw e;
+      }
+
+      // 2. Fallback to getFreighterAddress
+      if (!publicKey) {
         try {
           const addrObj = await getFreighterAddress();
           if (addrObj && addrObj.address) {
             publicKey = addrObj.address;
-          } else if (typeof addrObj === 'string' && addrObj) {
+          } else if (typeof addrObj === 'string' && addrObj && !addrObj.includes('error')) {
             publicKey = addrObj;
           }
         } catch (_) {}
       }
 
-      // 2. Fallback to window.freighterApi or window.freighter
+      // 3. Fallback to window.freighterApi or window.freighter or window.stellar
       if (!publicKey && typeof window !== 'undefined') {
-        const freighterApi = window.freighterApi || window.freighter;
+        const freighterApi =
+          window.freighterApi || window.freighter || window.stellar?.freighter || window.stellar;
         if (freighterApi) {
           try {
-            const isAllowed = await freighterApi.isAllowed?.();
-            if (!isAllowed) {
-              await freighterApi.setAllowed?.();
+            if (typeof freighterApi.requestAccess === 'function') {
+              const res = await freighterApi.requestAccess();
+              publicKey = res?.address || (typeof res === 'string' ? res : null);
             }
-            publicKey = await freighterApi.getPublicKey?.();
+            if (!publicKey && typeof freighterApi.getPublicKey === 'function') {
+              const res = await freighterApi.getPublicKey();
+              publicKey = res?.address || (typeof res === 'string' ? res : null);
+            }
           } catch (e) {
-            publicKey = await freighterApi.getPublicKey?.();
+            if (
+              e?.message?.includes('User declined') ||
+              e?.message?.includes('rejected') ||
+              e?.message?.includes('denied')
+            ) {
+              throw new WalletRejectionError();
+            }
           }
         }
       }
 
       if (!publicKey) {
-        throw new WalletNotFoundError('Freighter');
+        const isInstalled = await this.isProviderInstalledAsync('freighter');
+        if (!isInstalled) {
+          throw new WalletNotFoundError('Freighter');
+        }
+        throw new WalletConnectionError(
+          'Could not retrieve account from Freighter. Please unlock Freighter and approve access.'
+        );
       }
 
       this.provider = 'freighter';
@@ -156,7 +184,13 @@ export class WalletService {
 
       return { publicKey };
     } catch (error) {
-      if (error instanceof WalletConnectionError || error instanceof WalletNotFoundError) throw error;
+      if (
+        error instanceof WalletConnectionError ||
+        error instanceof WalletNotFoundError ||
+        error instanceof WalletRejectionError
+      ) {
+        throw error;
+      }
       if (
         error?.message?.includes('rejected') ||
         error?.message?.includes('denied') ||
