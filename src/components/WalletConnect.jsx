@@ -11,6 +11,7 @@ export const WalletConnect = ({ onConnected }) => {
     error,
     provider,
     connect,
+    connectAddress,
     disconnect,
     refreshBalance,
     isProviderInstalled,
@@ -107,6 +108,22 @@ export const WalletConnect = ({ onConnected }) => {
     );
   }
 
+  const [customKey, setCustomKey] = React.useState('');
+  const [showKeyInput, setShowKeyInput] = React.useState(false);
+
+  const handleCustomConnect = async (e) => {
+    e.preventDefault();
+    if (!customKey.trim()) return;
+    clearError();
+    try {
+      await connectAddress(customKey.trim(), 'freighter');
+      setCustomKey('');
+      setShowKeyInput(false);
+    } catch (err) {
+      // hook manages error state
+    }
+  };
+
   // ── Disconnected State ───────────────────────────────────────────────────
   return (
     <div id="wallet-connect-box" className="space-y-5 font-pixel-body">
@@ -187,8 +204,49 @@ export const WalletConnect = ({ onConnected }) => {
         })}
       </div>
 
-      <p className="text-[10px] text-center font-bold text-gray-600 pt-3 border-t border-dashed border-gray-300 mt-2">
-        YOUR KEYS STAY SAFE IN YOUR WALLET
+      <div className="pt-2 border-t border-dashed border-gray-300">
+        {!showKeyInput ? (
+          <button
+            type="button"
+            onClick={() => setShowKeyInput(true)}
+            className="w-full text-center text-[10px] font-bold text-gray-700 hover:text-black underline py-1 uppercase"
+          >
+            + Or connect via Stellar Public Key (G...)
+          </button>
+        ) : (
+          <form onSubmit={handleCustomConnect} className="space-y-2 mt-1">
+            <label className="block text-[10px] font-bold text-gray-700 uppercase">
+              Enter Freighter / Stellar Public Key:
+            </label>
+            <input
+              type="text"
+              value={customKey}
+              onChange={(e) => setCustomKey(e.target.value)}
+              placeholder="e.g. GCYIY6RPZKTWSJ73MKV7JXY3MXXRADKPLCL5BV5UQIEGVBK6GRYIHEBY"
+              className="w-full text-xs font-mono p-2 border-2 border-black bg-white focus:outline-none focus:bg-yellow-50"
+            />
+            <div className="flex space-x-2">
+              <button
+                type="submit"
+                disabled={loading || !customKey.trim()}
+                className="flex-1 text-xs font-pixel-heading font-bold bg-[#D4E751] text-black border-2 border-black py-1.5 hover:bg-yellow-400 active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-50"
+              >
+                SYNC ON-CHAIN ➔
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowKeyInput(false)}
+                className="text-xs font-bold bg-gray-200 border-2 border-black px-2 py-1.5 hover:bg-gray-300"
+              >
+                ✕
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      <p className="text-[10px] text-center font-bold text-gray-600 pt-2 border-t border-dashed border-gray-300">
+        LIVE STELLAR TESTNET • SECURE ON-CHAIN SIGNING
       </p>
     </div>
   );

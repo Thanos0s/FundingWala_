@@ -112,48 +112,59 @@ export class WalletService {
       // 1. Try official @stellar/freighter-api requestAccess
       try {
         const accessObj = await requestFreighterAccess();
-        if (accessObj && accessObj.address) {
-          publicKey = accessObj.address;
-        } else if (typeof accessObj === 'string' && accessObj && !accessObj.includes('error')) {
-          publicKey = accessObj;
-        } else if (accessObj && accessObj.error) {
-          if (
-            accessObj.error.includes('User declined') ||
-            accessObj.error.includes('rejected') ||
-            accessObj.error.includes('denied')
-          ) {
-            throw new WalletRejectionError();
+        if (accessObj) {
+          if (typeof accessObj === 'string' && !accessObj.includes('error')) {
+            publicKey = accessObj;
+          } else if (accessObj.address) {
+            publicKey = accessObj.address;
+          } else if (accessObj.publicKey) {
+            publicKey = accessObj.publicKey;
+          } else if (accessObj.error) {
+            if (
+              accessObj.error.includes('User declined') ||
+              accessObj.error.includes('rejected') ||
+              accessObj.error.includes('denied')
+            ) {
+              throw new WalletRejectionError();
+            }
           }
         }
       } catch (e) {
         if (e instanceof WalletRejectionError) throw e;
       }
 
-      // 2. Fallback to getFreighterAddress
+      // 2. Try getFreighterAddress
       if (!publicKey) {
         try {
           const addrObj = await getFreighterAddress();
-          if (addrObj && addrObj.address) {
-            publicKey = addrObj.address;
-          } else if (typeof addrObj === 'string' && addrObj && !addrObj.includes('error')) {
-            publicKey = addrObj;
+          if (addrObj) {
+            if (typeof addrObj === 'string' && !addrObj.includes('error')) {
+              publicKey = addrObj;
+            } else if (addrObj.address) {
+              publicKey = addrObj.address;
+            } else if (addrObj.publicKey) {
+              publicKey = addrObj.publicKey;
+            }
           }
         } catch (_) {}
       }
 
-      // 3. Fallback to window.freighterApi or window.freighter or window.stellar
+      // 3. Fallback to window.freighterApi or window.freighter
       if (!publicKey && typeof window !== 'undefined') {
-        const freighterApi =
-          window.freighterApi || window.freighter || window.stellar?.freighter || window.stellar;
-        if (freighterApi) {
+        const api = window.freighterApi || window.freighter;
+        if (api) {
           try {
-            if (typeof freighterApi.requestAccess === 'function') {
-              const res = await freighterApi.requestAccess();
-              publicKey = res?.address || (typeof res === 'string' ? res : null);
+            if (typeof api.requestAccess === 'function') {
+              const res = await api.requestAccess();
+              publicKey = res?.address || res?.publicKey || (typeof res === 'string' ? res : null);
             }
-            if (!publicKey && typeof freighterApi.getPublicKey === 'function') {
-              const res = await freighterApi.getPublicKey();
-              publicKey = res?.address || (typeof res === 'string' ? res : null);
+            if (!publicKey && typeof api.getPublicKey === 'function') {
+              const res = await api.getPublicKey();
+              publicKey = res?.address || res?.publicKey || (typeof res === 'string' ? res : null);
+            }
+            if (!publicKey && typeof api.getAddress === 'function') {
+              const res = await api.getAddress();
+              publicKey = res?.address || res?.publicKey || (typeof res === 'string' ? res : null);
             }
           } catch (e) {
             if (
@@ -167,22 +178,32 @@ export class WalletService {
         }
       }
 
+      // 4. Fallback to window.stellar
+      if (!publicKey && typeof window !== 'undefined' && window.stellar) {
+        try {
+          if (typeof window.stellar.request === 'function') {
+            const res = await window.stellar.request({ method: 'getPublicKey' });
+            publicKey = res?.address || res?.publicKey || (typeof res === 'string' ? res : null);
+          }
+        } catch (_) {}
+      }
+
       if (!publicKey) {
         const isInstalled = await this.isProviderInstalledAsync('freighter');
         if (!isInstalled) {
           throw new WalletNotFoundError('Freighter');
         }
         throw new WalletConnectionError(
-          'Could not retrieve account from Freighter. Please unlock Freighter and approve access.'
+          'Could not retrieve account from Freighter. Please unlock your Freighter extension, switch to Testnet, and approve connection.'
         );
       }
 
       this.provider = 'freighter';
-      this.publicKey = publicKey;
+      this.publicKey = publicKey.trim();
       sessionStorage.setItem('wallet_provider', 'freighter');
-      sessionStorage.setItem('wallet_address', publicKey);
+      sessionStorage.setItem('wallet_address', this.publicKey);
 
-      return { publicKey };
+      return { publicKey: this.publicKey };
     } catch (error) {
       if (
         error instanceof WalletConnectionError ||
@@ -307,6 +328,21 @@ export class WalletService {
     } catch (err) {
       throw new WalletConnectionError('Demo wallet creation failed: ' + err?.message);
     }
+  }
+
+  /**
+   * Connect with a specific Stellar address (e.g. user Freighter public key)
+   */
+  async connectAddress(publicKey, provider = 'freighter') {
+    const trimmed = (publicKey || '').trim();
+    if (!StellarSdk.StrKey.isValidEd25519PublicKey(trimmed)) {
+      throw new WalletConnectionError('Invalid Stellar Public Key (must be 56 chars starting with G)');
+    }
+    this.provider = provider;
+    this.publicKey = trimmed;
+    sessionStorage.setItem('wallet_provider', provider);
+    sessionStorage.setItem('wallet_address', trimmed);
+    return { publicKey: trimmed };
   }
 
   /**
@@ -437,6 +473,12 @@ export class WalletService {
 
     if (!savedProvider || !savedAddress) return null;
 
+    // Never auto-reconnect demo wallet so dummy account never overrides real wallet
+    if (savedProvider === 'demo') {
+      this.disconnect();
+      return null;
+    }
+
     try {
       if (!this.isProviderInstalled(savedProvider)) return null;
       await this.connect(savedProvider);
@@ -454,8 +496,15 @@ export class WalletService {
   disconnect() {
     this.provider = null;
     this.publicKey = null;
+    this.demoKeypair = null;
     sessionStorage.removeItem('wallet_provider');
     sessionStorage.removeItem('wallet_address');
+    sessionStorage.removeItem('demo_wallet_secret');
+    try {
+      localStorage.removeItem('wallet_provider');
+      localStorage.removeItem('wallet_address');
+      localStorage.removeItem('demo_wallet_secret');
+    } catch (_) {}
   }
 
   isConnected() {

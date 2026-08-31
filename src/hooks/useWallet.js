@@ -131,6 +131,30 @@ export const useWallet = () => {
 
   const clearError = useCallback(() => setError(null), []);
 
+  const connectAddress = useCallback(
+    async (publicKey, walletProvider = 'freighter') => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await walletService.connectAddress(publicKey, walletProvider);
+        setConnected(true);
+        setAddress(result.publicKey);
+        setProvider(walletProvider);
+        await fetchBalance(result.publicKey);
+        return result;
+      } catch (err) {
+        const errorInfo = handleError(err);
+        setError(errorInfo);
+        setConnected(false);
+        setAddress(null);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchBalance]
+  );
+
   return {
     connected,
     address,
@@ -139,6 +163,7 @@ export const useWallet = () => {
     error,
     provider,
     connect,
+    connectAddress,
     disconnect,
     refreshBalance,
     isProviderInstalled,
