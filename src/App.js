@@ -16,6 +16,42 @@ import { RefundPortal } from './components/RefundPortal';
 import { CreateCampaignForm } from './components/CreateCampaignForm';
 import { useCrowdfunding } from './hooks/useCrowdfunding';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('FundingWala UI Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-6 bg-red-100 border-3 border-black max-w-lg mx-auto my-8 shadow-[4px_4px_0px_0px_#000] font-pixel-body">
+          <h2 className="font-pixel-heading text-sm font-bold text-red-900 mb-2">SOMETHING WENT WRONG</h2>
+          <p className="text-xs text-red-800 mb-4">{this.state.error?.message || 'Unexpected application state.'}</p>
+          <button
+            onClick={() => {
+              sessionStorage.clear();
+              window.location.reload();
+            }}
+            className="font-pixel-heading text-xs font-bold bg-black text-[#D4E751] px-4 py-2 border-2 border-black hover:bg-gray-800"
+          >
+            RESET & REFRESH ↻
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const NAV_TABS = [
   { id: 'campaign', label: 'CAMPAIGN & DONATE', icon: 'coin' },
   { id: 'create', label: '+ CREATE CAMPAIGN', icon: 'sparkle' },
@@ -366,5 +402,11 @@ function App() {
   );
 }
 
-export default App;
+export default function RootApp() {
+  return (
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  );
+}
 

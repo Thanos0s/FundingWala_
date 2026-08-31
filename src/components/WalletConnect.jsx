@@ -19,6 +19,9 @@ export const WalletConnect = ({ onConnected }) => {
     clearError,
   } = useWallet();
 
+  const [customKey, setCustomKey] = React.useState('');
+  const [showKeyInput, setShowKeyInput] = React.useState(false);
+
   React.useEffect(() => {
     if (onConnected) onConnected(connected);
   }, [connected, onConnected]);
@@ -27,6 +30,19 @@ export const WalletConnect = ({ onConnected }) => {
     clearError();
     try {
       await connect(walletProvider);
+    } catch (err) {
+      // hook manages error state
+    }
+  };
+
+  const handleCustomConnect = async (e) => {
+    e.preventDefault();
+    if (!customKey.trim()) return;
+    clearError();
+    try {
+      await connectAddress(customKey.trim(), 'freighter');
+      setCustomKey('');
+      setShowKeyInput(false);
     } catch (err) {
       // hook manages error state
     }
@@ -107,22 +123,6 @@ export const WalletConnect = ({ onConnected }) => {
       </div>
     );
   }
-
-  const [customKey, setCustomKey] = React.useState('');
-  const [showKeyInput, setShowKeyInput] = React.useState(false);
-
-  const handleCustomConnect = async (e) => {
-    e.preventDefault();
-    if (!customKey.trim()) return;
-    clearError();
-    try {
-      await connectAddress(customKey.trim(), 'freighter');
-      setCustomKey('');
-      setShowKeyInput(false);
-    } catch (err) {
-      // hook manages error state
-    }
-  };
 
   // ── Disconnected State ───────────────────────────────────────────────────
   return (
